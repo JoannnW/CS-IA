@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="8dp"
+    android:animateLayoutChanges="false"
+    android:background="#BC9C6E">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#C59466"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/imageButton2"
+            android:layout_width="422dp"
+            android:layout_height="101dp"
+            android:backgroundTint="#9E7656"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.545"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.038"
+            app:srcCompat="@android:drawable/list_selector_background" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="346dp"
+            android:layout_height="53dp"
+            android:text="MY DOG BERNARD 🐶"
+            android:textColor="#D7BAAD"
+            android:textSize="34sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.476"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.07" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="top" />
+
+        <ImageButton
+            android:id="@+id/imageButton3"
+            android:layout_width="356dp"
+            android:layout_height="582dp"
+            android:backgroundTint="#9D7354"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.49"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.892"
+            app:srcCompat="@android:drawable/list_selector_background" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:text="Homepage"
+            android:textColor="#FFFFFF"
+            android:textSize="48sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.213" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif-monospace"
+            android:text="OWNER"
+            android:textColor="#65432A"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.182" />
+
+        <ScrollView
+            android:layout_width="345dp"
+            android:layout_height="482dp"
+            android:background="#68432A"
+            android:scrollbarStyle="insideInset"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.772">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/textView16"
+                    android:layout_width="311dp"
+                    android:layout_height="31dp"
+                    android:layout_marginBottom="4dp"
+                    android:fontFamily="serif"
+                    android:text="Food supply"
+                    android:textColor="#F2F0EE"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/textView19"
+                    android:layout_width="309dp"
+                    android:layout_height="wrap_content"
+                    android:background="#FBF4B5"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal"
+                    android:text="Food Left"
+                    android:textColor="#503A2B"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/textView21"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#C3A272"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text="00.00kg"
+                    android:textColor="#68422A"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/textView22"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="#FBF4B5"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal"
+                    android:text="Next Shopping Date"
+                    android:textColor="#503A2B"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/textView23"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#C3A272"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text="DD/MM/YYYY"
+                    android:textColor="#68422A"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="serif-monospace"
+                    android:text="Reschedule?"
+                    android:textSize="16sp"
+                    app:backgroundTint="#A94945" />
+
+                <View
+                    android:id="@+id/view4"
+                    android:layout_width="310dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:background="#DECEC4" />
+
+                <TextView
+                    android:id="@+id/textView25"
+                    android:layout_width="match_parent"
+                    android:layout_height="31dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:fontFamily="serif"
+                    android:text="Groom duties"
+                    android:textColor="#F2F0EE"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/textView26"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FBF4B5"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal"
+                    android:text="Proposed Grooming Dates"
+                    android:textColor="#503A2B"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView27"
+                        android:layout_width="206dp"
+                        android:layout_height="37dp"
+                        android:background="#C3A272"
+                        android:fontFamily="monospace"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:text="Option 1: DD/MM/YYYY 00:00-00:00"
+                        android:textColor="#523522"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/button11"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#4EA245"
+                        android:ellipsize="none"
+                        android:fontFamily="serif-monospace"
+                        android:maxLines="1"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:text="Request"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView29"
+                        android:layout_width="172dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#BC9C6E"
+                        android:fontFamily="monospace"
+                        android:gravity="center_horizontal"
+                        android:text="Option 2: DD/MM/YYYY 00:00-00:00"
+                        android:textColor="#65412A" />
+
+                    <Button
+                        android:id="@+id/button4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="6dp"
+                        android:backgroundTint="#4EA245"
+                        android:ellipsize="none"
+                        android:fontFamily="serif-monospace"
+                        android:maxLines="1"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:text="Request"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView30"
+                        android:layout_width="204dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#BC9C6E"
+                        android:fontFamily="monospace"
+                        android:gravity="center_horizontal"
+                        android:text="Option 3: DD/MM/YYYY 00:00-00:00"
+                        android:textColor="#65412A" />
+
+                    <Button
+                        android:id="@+id/button12"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#4EA245"
+                        android:ellipsize="none"
+                        android:fontFamily="serif-monospace"
+                        android:maxLines="1"
+                        android:paddingLeft="18dp"
+                        android:paddingRight="18dp"
+                        android:text="Request"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/imageButton8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:backgroundTint="#8A1F1C"
+                    app:srcCompat="@android:drawable/ic_popup_sync" />
+
+                <TextView
+                    android:id="@+id/textView31"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FBF4B5"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal"
+                    android:text="Status for Requested Date:       DD/MM/YYYY 00:00-00:00"
+                    android:textColor="#503A2B"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/textView32"
+                    android:layout_width="match_parent"
+                    android:layout_height="68dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#C3A272"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text="Invalid"
+                    android:textColor="#5F3420"
+                    android:textSize="24sp" />
+
+                <View
+                    android:id="@+id/view6"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:background="#DECEC4" />
+
+                <TextView
+                    android:id="@+id/textView33"
+                    android:layout_width="match_parent"
+                    android:layout_height="31dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:fontFamily="serif"
+                    android:text="Doctor Notes"
+                    android:textColor="#F2F0EE"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/textView34"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#F1EAAE"
+                    android:text="What are your concerns? (Keep it brief)"
+                    android:textColor="#2B2D30"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.234"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.522" />
+
+                <EditText
+                    android:id="@+id/editTextText4"
+                    android:layout_width="match_parent"
+                    android:layout_height="172dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/border_for_note"
+                    android:drawableTint="#F0F0F0"
+                    android:ems="10"
+                    android:fontFamily="serif-monospace"
+                    android:gravity="start|top"
+                    android:hint="Write here..."
+                    android:inputType="text"
+                    android:padding="12dp"
+                    android:textColor="#DBB198"
+                    android:textColorHint="#D1AB94"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.53"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.568" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView35"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="monospace"
+                        android:text="Newest Concern"
+                        android:textColor="#F1EAAE"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:id="@+id/view7"
+                        android:layout_width="175dp"
+                        android:layout_height="2dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginTop="16dp"
+                        android:background="#E7E0A8" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textView38"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FBF4B5"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal"
+                    android:text="Your concern:"
+                    android:textColor="#503A2B"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView40"
+                        android:layout_width="156dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="monospace"
+                        android:gravity="center_horizontal"
+                        android:text="URGENCY LVL"
+                        android:textColor="#F1EAAE"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/textView41"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="7dp"
+                        android:layout_marginTop="6dp"
+                        android:background="#C59270"
+                        android:fontFamily="sans-serif-medium"
+                        android:gravity="center_horizontal"
+                        android:text="PENDING"
+                        android:textColor="#FFFFFF"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textView39"
+                    android:layout_width="310dp"
+                    android:layout_height="162dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#C3A272"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text="..."
+                    android:textColor="#5F3420"
+                    android:textSize="24sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView15"
+                        android:layout_width="141dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_weight="1"
+                        android:text="Doctors Appointment"
+                        android:textColor="#F1EAAE"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:id="@+id/view5"
+                        android:layout_width="152dp"
+                        android:layout_height="2dp"
+                        android:layout_marginTop="19dp"
+                        android:background="#F1EAAE" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textView36"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FBF4B5"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal"
+                    android:text="Proposed Doctors Dates"
+                    android:textColor="#503A2B"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView37"
+                        android:layout_width="207dp"
+                        android:layout_height="37dp"
+                        android:background="#C3A272"
+                        android:fontFamily="monospace"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:text="Option 1: DD/MM/YYYY 00:00-00:00"
+                        android:textColor="#523522"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/button13"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#4EA245"
+                        android:ellipsize="none"
+                        android:fontFamily="serif-monospace"
+                        android:maxLines="1"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:text="Request"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView42"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#BC9C6E"
+                        android:fontFamily="monospace"
+                        android:gravity="center_horizontal"
+                        android:text="Option 2: DD/MM/YYYY 00:00-00:00"
+                        android:textColor="#65412A" />
+
+                    <Button
+                        android:id="@+id/button14"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="6dp"
+                        android:backgroundTint="#4EA245"
+                        android:ellipsize="none"
+                        android:fontFamily="serif-monospace"
+                        android:maxLines="1"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:text="Request"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView43"
+                        android:layout_width="206dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#BC9C6E"
+                        android:fontFamily="monospace"
+                        android:gravity="center_horizontal"
+                        android:text="Option 3: DD/MM/YYYY 00:00-00:00"
+                        android:textColor="#65412A" />
+
+                    <Button
+                        android:id="@+id/button15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#4EA245"
+                        android:ellipsize="none"
+                        android:fontFamily="serif-monospace"
+                        android:maxLines="1"
+                        android:paddingLeft="18dp"
+                        android:paddingRight="18dp"
+                        android:text="Request"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/imageButton9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:backgroundTint="#8A1F1C"
+                    app:srcCompat="@android:drawable/ic_popup_sync" />
+
+                <TextView
+                    android:id="@+id/textView44"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FBF4B5"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal"
+                    android:text="Status for Requested Date:       DD/MM/YYYY 00:00-00:00"
+                    android:textColor="#503A2B"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/textView17"
+                    android:layout_width="match_parent"
+                    android:layout_height="68dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#C3A272"
+                    android:fontFamily="monospace"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text="Invalid"
+                    android:textColor="#5F3420"
+                    android:textSize="24sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"/>
+
+
+            </LinearLayout>
+        </ScrollView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

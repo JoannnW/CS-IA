@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "32474676605",
+    "firebase_url": "https://cs-ia-firebase-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "cs-ia-firebase",
+    "storage_bucket": "cs-ia-firebase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32474676605:android:8f62a9c2e6a8cd487e6014",
+        "android_client_info": {
+          "package_name": "com.company.csia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMKnZ7mx5j3EEva7KyZRNxbTLQ1GuVEB8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
