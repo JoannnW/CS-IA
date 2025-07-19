@@ -5,14 +5,18 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+
 public class GroomerHome extends AppCompatActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.groomer_homepage);
+        String username = getIntent().getStringExtra("username");
+        ArrayList<String> openDays = getIntent().getStringArrayListExtra("openDays");
 
-        String userName = getIntent().getStringExtra("userName");
         TextView textView = findViewById(R.id.textView2);
-        textView.setText("Welcome, " + userName);
+        textView.setText("Welcome, " + username);
     }
 }

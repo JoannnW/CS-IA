@@ -11,6 +11,10 @@ public abstract class Identity{
         this.identity = identity;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public abstract void goToHome(Context context);
     public abstract void goToRegistration(Context context);
 }
