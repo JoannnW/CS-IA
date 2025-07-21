@@ -18,4 +18,24 @@ public class FirebaseGroomer {
         this.businessHrs = businessHrs;
         this.durationMin = durationMin;
     }
+
+    public int getDurationMin() {
+        return durationMin;
+    }
+
+    public String getBusinessHrs() {
+        return businessHrs;
+    }
+
+    public List<String> getOpenDays() {
+        return openDays;
+    }
+
+    public String getIdentity() {
+        return identity;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

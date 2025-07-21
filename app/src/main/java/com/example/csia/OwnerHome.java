@@ -1,82 +1,289 @@
 package com.example.csia;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.provider.CalendarContract;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.DateTime;
-import com.google.firebase.events.Event;
+import com.example.csia.Firebase.FirebaseDoctor;
+import com.example.csia.Firebase.FirebaseGroomer;
+import com.example.csia.Utilities.AppointmentRequest;
+import com.example.csia.Utilities.AppointmentSlotCalc;
+import com.example.csia.Utilities.BusyTime;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class OwnerHome extends AppCompatActivity {
+    private String username;
+    private double weight;
+    private double dailyIntake;
+    private String latestShoppingDateStr;
+    private String ownerKey; //used to track Firebase key
+
+    private List<BusyTime> busyTimes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_homepage);
 
-
-        String username = getIntent().getStringExtra("username");
+        //get intent extras
+        username = getIntent().getStringExtra("username");
         String storeName = getIntent().getStringExtra("storeName");
         String openingHours = getIntent().getStringExtra("openingHours");
-        double weight = getIntent().getDoubleExtra("weight", 0.0);
+        weight = getIntent().getDoubleExtra("weight", 0.0);
+        dailyIntake = getIntent().getDoubleExtra("dailyIntake", 0.0);
+        latestShoppingDateStr = getIntent().getStringExtra("latestShoppingDate");
+        ownerKey = getIntent().getStringExtra("ownerKey"); //added for firebase update
         ArrayList<String> openDays = getIntent().getStringArrayListExtra("openDays");
+        busyTimes = (ArrayList<BusyTime>) getIntent().getSerializableExtra("busyTimes");
+        if (busyTimes == null){ busyTimes = new ArrayList<>(); }
 
+        //initalise UI
         TextView welcomeTxt = findViewById(R.id.textView2);
         welcomeTxt.setText("Welcome, " + username);
 
         TextView storeNameTxt = findViewById(R.id.textView16);
         storeNameTxt.setText("Food supply from " + storeName);
+
+        //calculate and display food info
+        updateFoodInfo();
+
+        //set up refresh buttons - for all 3 options
+        findViewById(R.id.imageButton9).setOnClickListener(v -> loadDoctors());
+        findViewById(R.id.imageButton8).setOnClickListener(v -> loadGroomers());
+
+        //set up reschedule button - shoppingDate
+        Button rescheduleBtn = findViewById(R.id.button);
+        rescheduleBtn.setOnClickListener(v -> rescheduleShopping());
+
+        loadDoctors();
+        loadGroomers();
     }
 
-    //called after user signs in with their Google account
-    private void fetchCalendarEvents(GoogleSignInAccount account){
+    private void updateFoodInfo(){
+        //calc food left
+        double foodLeft = calculateFoodLeft(weight, dailyIntake, latestShoppingDateStr);
+        TextView foodLeftTxt = findViewById(R.id.textView21);
+        foodLeftTxt.setText(String.format("%.2fkg", foodLeft));
 
-        //helps Google identify user's account
-        GoogleAccountCredential cred = GoogleAccountCredential.usingOAuth2(
-                this, Collections.singleton(CalendarScopes.CALENDAR) //ask for Calendar permission
+        //calc next shopping date
+        String nextShopDate = calculateNextShoppingDate(weight, dailyIntake, latestShoppingDateStr);
+        TextView nextShopTxt = findViewById(R.id.textView23);
+        nextShopTxt.setText(nextShopDate);
+    }
+
+    private double calculateFoodLeft(double totalWeight, double dailyIntake, String lastDateStr){
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date lastDate = sdf.parse(lastDateStr);
+            Date today = new Date();
+
+            long diff = today.getTime() - lastDate.getTime();
+            int daysPassed = (int) (diff / (1000 * 60 * 60 * 24));
+
+            double consumed = daysPassed * dailyIntake;
+            return Math.max(0, totalWeight - consumed);
+        } catch (ParseException e){
+            return 0.0;
+        }
+    }
+
+    private String calculateNextShoppingDate(double totalWeight, double dailyIntake, String lastDateStr){
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date lastDate = sdf.parse(lastDateStr);
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(lastDate);
+
+            int totalDays = (int) (totalWeight / dailyIntake);
+            cal.add(Calendar.DAY_OF_YEAR, totalDays - 10); //10 days before running out
+
+            return sdf.format(cal.getTime());
+        } catch (ParseException e){
+            return "DD/MM/YYYY";
+        }
+    }
+
+    private void rescheduleShopping(){
+        //get today's date
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day =c.get(Calendar.DAY_OF_MONTH);
+
+        //show date picker dialog
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    //format the date
+                    Calendar selectedDate = Calendar.getInstance();
+                    selectedDate.set(selectedYear, selectedMonth, selectedDay);
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    String newDate = sdf.format(selectedDate.getTime());
+
+                    //update Firebase
+                    updateShoppingDateInFirebase(newDate);
+                }, year, month, day);
+        datePickerDialog.show();
+    }
+
+    private void updateShoppingDateInFirebase(String newDate){
+        if(ownerKey != null){
+            DatabaseReference ownerRef = FirebaseDatabase.getInstance()
+                    .getReference("users")
+                    .child(ownerKey)
+                    .child("latestShoppingDate");
+            ownerRef.setValue(newDate)
+                    .addOnSuccessListener(aVoid -> {
+                        //update local data and UI
+                        latestShoppingDateStr = newDate;
+                        updateFoodInfo();
+                        Toast.makeText(this, "Shopping date updated!", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e ->{
+                        Toast.makeText(this, "Failed to update date: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
+    private void loadDoctors(){
+        Query doctorsQuery = FirebaseDatabase.getInstance().getReference("users")
+                .orderByChild("identity").equalTo("doctor");
+
+        doctorsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot doctorSnap : snapshot.getChildren()) {
+                    FirebaseDoctor doctor = doctorSnap.getValue(FirebaseDoctor.class);
+                    if (doctor != null) {
+                        //need to implement this with the actual Google calendar api
+                        List<String> slots = AppointmentSlotCalc.findAvailableSlot(
+                                busyTimes,
+                                doctor,
+                                doctor.openDays,
+                                doctor.durationMin
+                        );
+                        showSlots(doctor.name, slots, "doctor");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error){
+                Toast.makeText(OwnerHome.this, "Failed to load doctor's availabilities", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadGroomers(){
+        Query groomersQuery = FirebaseDatabase.getInstance().getReference("users")
+                .orderByChild("identity").equalTo("groomer");
+
+        groomersQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot groomerSnap : snapshot.getChildren()) {
+                    FirebaseGroomer groomer = groomerSnap.getValue(FirebaseGroomer.class);
+                    if (groomer != null) {
+                        List<String> slots = AppointmentSlotCalc.findAvailableSlot(
+                                busyTimes, groomer, groomer.openDays, groomer.durationMin
+                        );
+                        showSlots(groomer.name, slots, "groomer");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error){
+                Toast.makeText(OwnerHome.this, "Failed to load groomer's availabilities", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showSlots(String providerName, List<String> slots, String type){
+        int[] slotTextIds;
+        int[] buttonIds;
+
+        if (type.equals("groomer")){
+            slotTextIds = new int[]{R.id.textView27, R.id.textView29, R.id.textView30};
+            buttonIds = new int[]{R.id.button11, R.id.button4, R.id.button12};
+        } else { //doctor
+            slotTextIds = new int[]{R.id.textView37, R.id.textView42, R.id.textView43};
+            buttonIds = new int[]{R.id.button13, R.id.button14, R.id.button15};
+        }
+
+        for (int i = 0; i < 3; i ++){
+            TextView slotText = findViewById(slotTextIds[i]);
+            Button slotButton = findViewById(buttonIds[i]);
+
+            if (i < slots.size()){
+                slotText.setText("Option " + (i + 1) + ": " + slots.get(i));
+
+                //create final copies for use
+                final String finalProviderName = providerName;
+                final String finalSlot = slots.get(i);
+                final String finalType = type;
+
+                slotButton.setOnClickListener(v -> requestAppointment(finalProviderName, finalSlot, finalType));
+                slotText.setVisibility(View.VISIBLE);
+                slotButton.setVisibility(View.VISIBLE);
+            } else{
+                slotText.setVisibility(View.GONE);
+                slotButton.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void requestAppointment(String providerName, String slotTime, String type){
+        //create request object
+        AppointmentRequest request = new AppointmentRequest(
+                username,
+                providerName,
+                slotTime,
+                type,
+                "pending"
         );
 
-        cred.setSelectedAccount(account.getAccount()); //set the signed-in Google account (modifier method)
+        //save to Firebase
+        DatabaseReference requestsRef = FirebaseDatabase.getInstance().getReference("appointment_requests");
+        requestsRef.push().setValue(request);
 
-        //create Calendar service using cred (use Google's good stuff and link it to my app)
-        Calendar service = new Calendar.Builder(
-                AndroidHttp.newCompatibleTransport(), //access Android's network Library
-                JacksonFactory.getDefaultInstance(),  //Use Google's default JSON convertor
-                cred)                                 //use the signed-in acc
-                .setApplicationName("CSIA").build();
+        //update UI
+        String statusTextId;
+        if(type.equals("groomer")){
+            statusTextId = "groomer";
+        } else {
+            statusTextId = "doctor";
+        }
+        TextView statusText;
+        if(type.equals("groomer")){
+            statusText = findViewById(R.id.textView32);
+        } else {
+            statusText = findViewById(R.id.textView17);
+        }
+        statusText.setText("Pending");
 
-        //avoid freezing screen with Thread
-        new Thread(()->{
-            try {
-                //set time to now
-                DateTime now = new DateTime(System.currentTimeMillis());
-
-                //ask Google Calendar for upcoming events
-                CalendarContract.Events events = service.events().list("primary") //access events in "primary"/ main cal
-                        .setMaxResults(5) //retrieve up to 5 events
-                        .setTimeMin(now)  //only get future events
-                        .setOrderBy("startTime")   //sort by when they start
-                        .setSingleEvents(true)     //Ignore repeating events
-                        .execute();
-
-                //Store events in an ArrayList
-                List<Event> items = events.getItems();
-
-                //update buttons on screen (need to use onUIThread)
-                runOnUiThread(()-> {
-                    
-                });
-            }
-        })
+        Toast.makeText(this, "Request sent to " + providerName, Toast.LENGTH_SHORT).show();
     }
+
+
 }

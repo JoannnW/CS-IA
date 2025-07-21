@@ -49,7 +49,7 @@ public class Groomer extends Identity {
     @NonNull
     @Override
     public String toString() {
-        return "Name: " + name + ", OpenDays: " + openDays.toString() + ", businessHrs: " + businessHrs + ", Appointment duration: " + duration;
+        return "Name: " + name + ", OpenDays: " + openDays.toString() + ", businessHrs: " + businessHrs + ", Appointment duration: " + durationMin;
     }
 
     public Groomer(String name){

@@ -18,4 +18,24 @@ public class FirebaseDoctor {
         this.businessHrs = businessHrs;
         this.durationMin = durationMin;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<String> getOpenDays() {
+        return openDays;
+    }
+
+    public int getDurationMin() {
+        return durationMin;
+    }
+
+    public String getBusinessHrs() {
+        return businessHrs;
+    }
+
+    public String getIdentity() {
+        return identity;
+    }
 }

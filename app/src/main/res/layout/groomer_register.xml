@@ -8,42 +8,28 @@
 
     <ImageButton
         android:id="@+id/imageButton6"
-        android:layout_width="348dp"
-        android:layout_height="611dp"
+        android:layout_width="349dp"
+        android:layout_height="546dp"
         android:backgroundTint="#9D7354"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.534"
+        app:layout_constraintHorizontal_bias="0.566"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.552"
+        app:layout_constraintVertical_bias="0.458"
         app:srcCompat="@android:drawable/list_selector_background" />
 
     <ImageButton
         android:id="@+id/imageButton7"
-        android:layout_width="346dp"
-        android:layout_height="521dp"
+        android:layout_width="348dp"
+        android:layout_height="460dp"
         android:backgroundTint="#68432A"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.538"
+        app:layout_constraintHorizontal_bias="0.539"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.562"
         app:srcCompat="@android:drawable/list_selector_background" />
-
-    <ImageButton
-        android:id="@+id/imageButton11"
-        android:layout_width="329dp"
-        android:layout_height="88dp"
-        android:backgroundTint="#765644"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.536"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.715"
-        app:srcCompat="@android:drawable/ic_menu_upload" />
 
     <View
         android:id="@+id/view3"
@@ -57,6 +43,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.588" />
 
+    <View
+        android:id="@+id/view9"
+        android:layout_width="190dp"
+        android:layout_height="2dp"
+        android:background="#DECEC4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.673" />
+
     <Button
         android:id="@+id/button16"
         android:layout_width="93dp"
@@ -67,10 +65,10 @@
         app:backgroundTint="#D37D45"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.864"
+        app:layout_constraintHorizontal_bias="0.855"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.786" />
+        app:layout_constraintVertical_bias="0.718" />
 
     <ImageButton
         android:id="@+id/imageButton12"
@@ -79,25 +77,11 @@
         app:backgroundTint="#D37D45"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.696"
+        app:layout_constraintHorizontal_bias="0.688"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.790"
+        app:layout_constraintVertical_bias="0.72"
         app:srcCompat="@android:drawable/ic_media_play" />
-
-    <TextView
-        android:id="@+id/textView20"
-        android:layout_width="321dp"
-        android:layout_height="23dp"
-        android:text="Please upload your schedule (PDF):"
-        android:textColor="#D1BFB5"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.522"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.62" />
 
     <EditText
         android:id="@+id/editTextText7"
@@ -368,6 +352,31 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.038"
         app:srcCompat="@android:drawable/list_selector_background" />
+
+    <TextView
+        android:id="@+id/textView20"
+        android:layout_width="193dp"
+        android:layout_height="51dp"
+        android:text="Connect to  your Google Calendar here:"
+        android:textColor="#D1BFB5"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.201"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.641" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="137dp"
+        android:layout_height="54dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.828"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.641" />
 
     <TextView
         android:id="@+id/textView3"
