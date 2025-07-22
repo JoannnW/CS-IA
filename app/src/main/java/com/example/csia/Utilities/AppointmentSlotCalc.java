@@ -23,11 +23,17 @@ public class AppointmentSlotCalc {
         Calendar calendar = Calendar.getInstance();
 
         //get business hours
-        String businessHours = "";
+        String businessHours = "09:00-17:00";
         if (serviceProvider instanceof FirebaseDoctor){
-            businessHours = ((FirebaseDoctor) serviceProvider).businessHrs;
+            String hrs = ((FirebaseDoctor) serviceProvider).businessHrs;
+            if (hrs != null && !hrs.trim().isEmpty()){
+                businessHours = hrs;
+            }
         } else if (serviceProvider instanceof FirebaseGroomer){
-            businessHours = ((FirebaseGroomer) serviceProvider).businessHrs;
+            String hrs = ((FirebaseGroomer) serviceProvider).businessHrs;
+        if (hrs != null && !hrs.trim().isEmpty()){
+            businessHours = hrs;
+        }
         }
 
         String[] hours = businessHours.split("-");
@@ -40,7 +46,14 @@ public class AppointmentSlotCalc {
             Date openTime = timeFormat.parse(hours[0].trim());
             Date closeTime = timeFormat.parse(hours[1].trim());
 
-            //Check for next 7 days
+            //extract hour/min from parsed times into separate Cal instances
+            Calendar openCal = Calendar.getInstance();
+            openCal.setTime(openTime);
+
+            Calendar closeCal = Calendar.getInstance();
+            closeCal.setTime(closeTime);
+
+            //Loop through the next 7 days (starting from tmr)
             for (int i = 0; i < 7; i ++){
                 calendar.add(Calendar.DAY_OF_MONTH, 1);
                 String dayOfWeek = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US).toUpperCase();
@@ -50,13 +63,20 @@ public class AppointmentSlotCalc {
 
                 //set calendar to open times
                 Calendar slotCalendar = (Calendar) calendar.clone();
-                slotCalendar.set(Calendar.HOUR_OF_DAY, openTime.getHours());
-                slotCalendar.set(Calendar.MINUTE, openTime.getMinutes());
+                slotCalendar.set(Calendar.HOUR_OF_DAY, openCal.get(Calendar.HOUR_OF_DAY));
+                slotCalendar.set(Calendar.MINUTE, openCal.get(Calendar.MINUTE));
                 slotCalendar.set(Calendar.SECOND, 0);
                 slotCalendar.set(Calendar.MILLISECOND, 0);
 
+                //set the closing time for that same day
+                Calendar dayClose = (Calendar) calendar.clone();
+                dayClose.set(Calendar.HOUR_OF_DAY, closeCal.get(Calendar.HOUR_OF_DAY));
+                dayClose.set(Calendar.MINUTE, closeCal.get(Calendar.MINUTE));
+                dayClose.set(Calendar.SECOND, 0);
+                dayClose.set(Calendar.MILLISECOND, 0);
+
                 //Generate open slots for this day
-                while (slotCalendar.getTime().before(closeTime)){
+                while (slotCalendar.before(dayClose)){
                     Calendar endCalendar = (Calendar) slotCalendar.clone();
                     endCalendar.add(Calendar.MINUTE, durationMin);
 

@@ -123,31 +123,14 @@ public class Owner extends Identity {
     }
 
     public static boolean isValidDate(String dateStr){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        dateFormat.setLenient(false);//strict parsing
+        if (dateStr == null || dateStr.isEmpty()) return false;
 
-        try{
-            //validate format first
-            if(!dateStr.matches("\\\\d{2}/\\\\d{2}/\\\\d{4}")){
-                return false;
-            }
-
-            //parse the date
-            Date date = dateFormat.parse(dateStr);
-
-            //additional manual validation
-            String[] parts = dateStr.split("/");
-            int day = Integer.parseInt(parts[0]);
-            int month = Integer.parseInt(parts[1]);
-            int year = Integer.parseInt(parts[2]);
-
-            //check valid ranges
-            if (day < 1 || day > 31) return false;
-            if (month < 1 || month > 12) return false;
-            if (year < 1000 || year > 9999) return false;
-
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        sdf.setLenient(false); // strict parsing
+        try {
+            sdf.parse(dateStr);
             return true;
-        } catch (ParseException | NumberFormatException | ArrayIndexOutOfBoundsException e){
+        } catch (ParseException e) {
             return false;
         }
     }

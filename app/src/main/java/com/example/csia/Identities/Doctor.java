@@ -14,6 +14,7 @@ public class Doctor extends Identity {
     private List<String> openDays;
     private String businessHrs;
     private int durationMin = 0;
+    private boolean isGoogleConnected;
 
 
     //used for hours/minutes validation
@@ -27,11 +28,12 @@ public class Doctor extends Identity {
     public static final int MINUTES_INVALID = 7;
     public static final int MISSING_M = 8;
 
-    public Doctor(String name, List<String> openDays, String businessHrs, int durationMin){
+    public Doctor(String name, List<String> openDays, String businessHrs, int durationMin, boolean isGoogleConnected){
         super(name, "doctor");
         this.openDays = openDays;
         this.businessHrs = businessHrs;
         this.durationMin += durationMin;
+        this.isGoogleConnected = isGoogleConnected;
     }
 
     public List<String> getOpenDays() {
@@ -44,6 +46,14 @@ public class Doctor extends Identity {
 
     public int getDurationMin() {
         return durationMin;
+    }
+
+    public boolean isGoogleConnected() {
+        return isGoogleConnected;
+    }
+
+    public void setGoogleConnected(boolean googleConnected) {
+        isGoogleConnected = googleConnected;
     }
 
     @NonNull

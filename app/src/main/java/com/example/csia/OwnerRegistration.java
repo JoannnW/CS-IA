@@ -14,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.csia.Firebase.FirebaseOwner;
@@ -23,6 +25,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.internal.GoogleSignInOptionsExtensionParcelable;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.android.gms.common.api.Scope;
@@ -45,7 +48,9 @@ public class OwnerRegistration extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private boolean areFieldsValid = false;
     private boolean isGoogleConnected = false;
-    private Button googleSignInButton; private TextView btnGoogleUpdate;
+    private SignInButton googleSignInButton; private TextView btnGoogleUpdate;
+    private ActivityResultLauncher<Intent> googleSignInLauncher;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +81,26 @@ public class OwnerRegistration extends AppCompatActivity {
             if (validateOwner(owner)){signInWithGoogle(); }
             else { Toast.makeText(this,"Please fill all fields correctly first",Toast.LENGTH_SHORT).show();}});
 
+        googleSignInLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                        if (task.isSuccessful()) {
+                            GoogleSignInAccount account = task.getResult();
+                            isGoogleConnected = true;
+                            btnGoogleUpdate = findViewById(R.id.textView49);
+                            btnGoogleUpdate.setText("Google connected!");
+                            Toast.makeText(this, "Successful Google Sign-in", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Google Sign-In failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(this, "Google Sign-In canceled or failed.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
         submitBtn.setOnClickListener(view -> {
             Owner owner = collectOwnerInpt();
             if (validateOwner(owner) && isGoogleConnected){ onSubmit(owner); }
@@ -104,11 +129,22 @@ public class OwnerRegistration extends AppCompatActivity {
         String storeName = storeNameInpt.getText().toString().trim();
         String openingHours = openingHoursInpt.getText().toString().trim();
 
-        String weightStr = weightInpt.getText().toString().trim().toLowerCase().replace(" ","");//remove ANY spaces or uppercase
-        double weight = Double.parseDouble(weightStr.replace("kg", ""));
+        double weight = -1;  // default invalid value
+        try {
+            String weightStr = weightInpt.getText().toString().trim().toLowerCase().replace(" ","");
+            weight = Double.parseDouble(weightStr.replace("kg", "").replace(",", "."));
+        } catch (NumberFormatException e) {
+            // weight remains -1
+        }
 
-        String dailyIntakeStr = dailyIntakeInpt.getText().toString().trim().toLowerCase().replace(" ","");
-        double dailyIntake = Double.parseDouble(dailyIntakeStr.replace("kg",""));
+        double dailyIntake = -1;
+        try {
+            String dailyIntakeStr = dailyIntakeInpt.getText().toString().trim().toLowerCase().replace(" ","");
+            dailyIntake = Double.parseDouble(dailyIntakeStr.replace("kg", "").replace(",", "."));
+        } catch (NumberFormatException e) {
+            // dailyIntake remains -1
+        }
+
 
         String latestShoppingDate = latestShoppingDateInpt.getText().toString().trim();
 
@@ -179,11 +215,11 @@ public class OwnerRegistration extends AppCompatActivity {
             Toast.makeText(this, "Please enter a valid time range (e.g. 09:00-17:00)", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (!Owner.isValidWeight(owner.getWeight())){
+        if (owner.getWeight() == -1 || !Owner.isValidWeight(owner.getWeight())){
             Toast.makeText(this, "Weight must be between 0.00-999.99kg",Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (!Owner.isValidWeight(owner.getDailyIntake())){
+        if (owner.getDailyIntake() == -1 || !Owner.isValidWeight(owner.getDailyIntake())){
             Toast.makeText(this, "Weight must be between 0.00-999.99kg",Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -201,41 +237,10 @@ public class OwnerRegistration extends AppCompatActivity {
     }
 
     private void signInWithGoogle(){
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent,1001);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode,resultCode,data);
-        if (requestCode == 1001){
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            if (task.isSuccessful()){
-                GoogleSignInAccount account = task.getResult();
-                isGoogleConnected = true;
-                btnGoogleUpdate = findViewById(R.id.textView49);
-                btnGoogleUpdate.setText("Google connected!");
-                Toast.makeText(this,"Successful Google Sign-in", Toast.LENGTH_SHORT).show();
-
-                submitBtn.setVisibility(View.VISIBLE);
-                submitBtn2.setVisibility(View.VISIBLE);
-
-            } else {
-                try{
-                    Exception exception = task.getException();
-                    if (exception instanceof ApiException){
-                        ApiException apiException = (ApiException) exception;
-                        int statuscode = apiException.getStatusCode();
-                        Toast.makeText(this,"Google Sign-In failed: " + statuscode, Toast.LENGTH_SHORT).show();
-                    } else{
-                        //handle other exceptions
-                        Toast.makeText(this,"Google Sign-In failed: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                } catch (Exception e){
-                    Toast.makeText(this, "Unexpected error during sign-in ", Toast.LENGTH_SHORT).show();
-
-                }
-            }
-        }
+        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
+            // Now launch the sign-in intent AFTER sign out
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            googleSignInLauncher.launch(signInIntent);
+        });
     }
 }

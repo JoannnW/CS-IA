@@ -10,8 +10,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.csia.Firebase.FirebaseAppointmentReq;
 import com.example.csia.Firebase.FirebaseDoctor;
 import com.example.csia.Firebase.FirebaseGroomer;
+import com.example.csia.Firebase.FirebaseOwner;
+import com.example.csia.Utilities.AppointmentOption;
 import com.example.csia.Utilities.AppointmentRequest;
 import com.example.csia.Utilities.AppointmentSlotCalc;
 import com.example.csia.Utilities.BusyTime;
@@ -36,6 +39,7 @@ public class OwnerHome extends AppCompatActivity {
     private double dailyIntake;
     private String latestShoppingDateStr;
     private String ownerKey; //used to track Firebase key
+    private String status;
 
     private List<BusyTime> busyTimes;
 
@@ -63,8 +67,7 @@ public class OwnerHome extends AppCompatActivity {
         TextView storeNameTxt = findViewById(R.id.textView16);
         storeNameTxt.setText("Food supply from " + storeName);
 
-        //calculate and display food info
-        updateFoodInfo();
+        fetchOwnerDataFromFirebase();
 
         //set up refresh buttons - for all 3 options
         findViewById(R.id.imageButton9).setOnClickListener(v -> loadDoctors());
@@ -111,11 +114,20 @@ public class OwnerHome extends AppCompatActivity {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             Date lastDate = sdf.parse(lastDateStr);
 
+            int totalDays = (int) (totalWeight / dailyIntake);
+            int safeDays = Math.max(0, totalDays - 3); //never negative
+
+            //target date = last date _ safeDays
             Calendar cal = Calendar.getInstance();
             cal.setTime(lastDate);
+            cal.add(Calendar.DAY_OF_YEAR, safeDays);
 
-            int totalDays = (int) (totalWeight / dailyIntake);
-            cal.add(Calendar.DAY_OF_YEAR, totalDays - 10); //10 days before running out
+            //today
+            Calendar today = Calendar.getInstance();
+
+            if (cal.before(today)){
+                cal = today;
+            }
 
             return sdf.format(cal.getTime());
         } catch (ParseException e){
@@ -253,37 +265,97 @@ public class OwnerHome extends AppCompatActivity {
         }
     }
 
-    private void requestAppointment(String providerName, String slotTime, String type){
-        //create request object
-        AppointmentRequest request = new AppointmentRequest(
-                username,
-                providerName,
-                slotTime,
-                type,
-                "pending"
-        );
+    private void requestAppointment(String providerName, String slotTime, String type) {
+        // Create request with all necessary info
+        AppointmentOption option = new AppointmentOption(slotTime);
+        AppointmentRequest request = new AppointmentRequest(ownerKey, providerName, type, option);
 
-        //save to Firebase
-        DatabaseReference requestsRef = FirebaseDatabase.getInstance().getReference("appointment_requests");
-        requestsRef.push().setValue(request);
+        // Save to Firebase
+        DatabaseReference requestsRef = FirebaseDatabase.getInstance()
+                .getReference("appointment_requests");
+        String requestKey = requestsRef.push().getKey();
+        requestsRef.child(requestKey).setValue(request);
 
-        //update UI
-        String statusTextId;
-        if(type.equals("groomer")){
-            statusTextId = "groomer";
-        } else {
-            statusTextId = "doctor";
+        // Disable all buttons for this provider
+        int[] buttonIds = type.equals("groomer")
+                ? new int[]{R.id.button11, R.id.button4, R.id.button12}
+                : new int[]{R.id.button13, R.id.button14, R.id.button15};
+
+        for (int id : buttonIds) {
+            findViewById(id).setEnabled(false);
         }
-        TextView statusText;
-        if(type.equals("groomer")){
-            statusText = findViewById(R.id.textView32);
-        } else {
-            statusText = findViewById(R.id.textView17);
-        }
+
+        // Update status
+        TextView statusText = findViewById(type.equals("groomer")
+                ? R.id.textView32 : R.id.textView17);
         statusText.setText("Pending");
 
         Toast.makeText(this, "Request sent to " + providerName, Toast.LENGTH_SHORT).show();
     }
 
+    private void loadAvailableAppointments(){
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("appointments");
+        Query query = FirebaseDatabase.getInstance().getReference("users")
+                .orderByChild("identity").equalTo("doctor");
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                status = snapshot.child("status").getValue(String.class);
+                TextView statusTxt = findViewById(R.id.textView32); statusTxt.setText(status);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(OwnerHome.this, "ref failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> options = new ArrayList<>();
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    FirebaseAppointmentReq appt = ds.getValue(FirebaseAppointmentReq.class);
+                    if(appt != null && appt.status.equals("pending")){
+                        options.add(appt.dateTime);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(OwnerHome.this, "query failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
+    private void fetchOwnerDataFromFirebase(){
+        if (ownerKey == null) return;
+
+        DatabaseReference ownerRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(ownerKey);
+        ownerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                FirebaseOwner owner = snapshot.getValue(FirebaseOwner.class);
+                if (owner != null){
+                    weight = owner.weight;
+                    dailyIntake = owner.dailyIntake;
+                    latestShoppingDateStr = owner.latestShoppingDate;
+
+                    updateFoodInfo();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(OwnerHome.this, "Failed to load owner data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
 }

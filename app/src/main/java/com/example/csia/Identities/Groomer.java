@@ -14,6 +14,7 @@ public class Groomer extends Identity {
     private List<String> openDays;
     private String businessHrs;
     private int durationMin = 0;
+    private boolean googleConnected;
 
     //used for hours/minutes validation
     public static final int VALID_TIME = 0;
@@ -27,11 +28,12 @@ public class Groomer extends Identity {
     public static final int MISSING_M = 8;
 
 
-    public Groomer(String name, List<String> openDays, String businessHrs, int durationMin){
+    public Groomer(String name, List<String> openDays, String businessHrs, int durationMin, boolean googleConnected){
         super(name, "groomer");
         this.openDays = openDays;
         this.businessHrs = businessHrs;
         this.durationMin += durationMin;
+        this.googleConnected = googleConnected;
     }
 
     public List<String> getOpenDays() {

@@ -8,12 +8,13 @@ public class FirebaseGroomer {
     public List<String> openDays;
     public String businessHrs;
     public int durationMin = 0;
+    public boolean isGoogleConnected;
 
     public FirebaseGroomer(){} //for Firebase deserialization
 
     public FirebaseGroomer(String name, List<String> openDays, String businessHrs, int durationMin){
         this.name = name;
-        this.identity = "owner";
+        this.identity = "groomer";
         this.openDays = openDays;
         this.businessHrs = businessHrs;
         this.durationMin = durationMin;
@@ -37,5 +38,13 @@ public class FirebaseGroomer {
 
     public String getName() {
         return name;
+    }
+
+    public void setGoogleConnected(boolean googleConnected) {
+        isGoogleConnected = googleConnected;
+    }
+
+    public void setIdentity(String identity) {
+        this.identity = identity;
     }
 }

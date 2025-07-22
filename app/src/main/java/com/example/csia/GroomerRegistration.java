@@ -12,27 +12,73 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.csia.Firebase.FirebaseGroomer;
-import com.example.csia.Identities.Doctor;
 import com.example.csia.Identities.Groomer;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GroomerRegistration extends AppCompatActivity {
     private String username;
-    private String durationStr;
 
+    private String durationStr;
     private EditText businessHrsInpt, durationInpt;
     private Button submitBtn;
     private ImageButton submitBtn2, exitBtn;
-    
-    
+
+    //Google Sign-in
+    private GoogleSignInClient mGoogleSignInClient;
+    private boolean areFieldsValid = false;
+    private boolean isGoogleConnected = false;
+    private SignInButton googleSignInButton; private TextView btnGoogleUpdate;
+    private ActivityResultLauncher<Intent> googleSignInLauncher;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.groomer_register);
+
+        //Initialize Google sign-in
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestScopes(new Scope("https://www.googleapis.com/auth/calendar"))
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
+        googleSignInButton = findViewById(R.id.sign_in_button);
+
+        googleSignInLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                        if (task.isSuccessful()) {
+                            GoogleSignInAccount account = task.getResult();
+                            isGoogleConnected = true;
+                            btnGoogleUpdate = findViewById(R.id.textView20);
+                            btnGoogleUpdate.setText("Google connected!");
+                            Toast.makeText(this, "Successful Google Sign-in", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Google Sign-In failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(this, "Google Sign-In canceled or failed.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
 
         username = getIntent().getStringExtra("username");  // get username from intent
 
@@ -42,9 +88,21 @@ public class GroomerRegistration extends AppCompatActivity {
         submitBtn2 = findViewById(R.id.imageButton12);
         exitBtn = findViewById(R.id.imageButton13);
 
+        googleSignInButton.setOnClickListener(v -> {
+            Groomer groomer = collectGroomerInpt();
+            if (validateGroomer(groomer)){signInWithGoogle(); }
+            else { Toast.makeText(this,"Please fill all fields correctly first",Toast.LENGTH_SHORT).show();}});
 
-        submitBtn.setOnClickListener(view -> onSubmit());
-        submitBtn2.setOnClickListener(view -> onSubmit());
+        submitBtn.setOnClickListener(view -> {
+            Groomer groomer = collectGroomerInpt();
+            if (validateGroomer(groomer) && isGoogleConnected){ onSubmit(groomer); }
+            else if (!isGoogleConnected) {Toast.makeText(this,"Please complete all steps", Toast.LENGTH_SHORT).show();} });
+
+        submitBtn2.setOnClickListener(view -> {
+            Groomer groomer = collectGroomerInpt();
+            if (validateGroomer(groomer) && isGoogleConnected){ onSubmit(groomer); }
+            else if (!isGoogleConnected) {Toast.makeText(this,"Please complete all steps", Toast.LENGTH_SHORT).show();} });
+
         exitBtn.setOnClickListener(view -> onExit());
     }
 
@@ -58,52 +116,66 @@ public class GroomerRegistration extends AppCompatActivity {
         }, 2000); //toast display and screen pauses for 2 seconds before screen switches back to login page
     }
 
-    private Groomer collectgroomerInpt(){
+    private Groomer collectGroomerInpt(){
         String businessHrs = businessHrsInpt.getText().toString().trim();
-        durationStr = durationInpt.getText().toString().trim().toLowerCase().replace(" ","");//remove ANY spaces or uppercase
-        String str = ""; boolean flag = false; int durationMin = 0;
-        int i = 0; while(i < durationStr.length() && flag == false){
-            if(durationStr.charAt(i) == 'h'){        //number before h, times 60; number after h, keep
+        durationStr = durationInpt.getText().toString().trim().toLowerCase().replace(" ", "");
+        int durationMin = 0;
 
-                for(int j = i; j >= 0; j--){
-                    str += durationStr.charAt(j);
-                }
-                durationMin += Integer.parseInt(str) * 60;
-                str = "";
-                for (int f = i; f < durationStr.length(); f++){
-                    str += durationStr.charAt(f);
-                }
-                durationMin += Integer.parseInt(str);
-                flag = true;
+        try {
+            int hIndex = durationStr.indexOf("h");
+            int mIndex = durationStr.indexOf("m");
+
+            if (hIndex != -1) {
+                String hoursStr = durationStr.substring(0, hIndex);
+                durationMin += Integer.parseInt(hoursStr) * 60;
             }
-            i++;
+
+            if (mIndex != -1 && mIndex > hIndex) {
+                String minutesStr = durationStr.substring(hIndex + 1, mIndex);
+                durationMin += Integer.parseInt(minutesStr);
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Invalid duration format", Toast.LENGTH_SHORT).show();
         }
 
         List<String> daysOpen = new ArrayList<>();
         //collect checkboxes
-        if (((CheckBox)findViewById(R.id.checkBox)).isChecked()) daysOpen.add("MON");
-        if (((CheckBox)findViewById(R.id.checkBox2)).isChecked()) daysOpen.add("TUE");
-        if (((CheckBox)findViewById(R.id.checkBox3)).isChecked()) daysOpen.add("WED");
-        if (((CheckBox)findViewById(R.id.checkBox4)).isChecked()) daysOpen.add("THU");
-        if (((CheckBox)findViewById(R.id.checkBox5)).isChecked()) daysOpen.add("FRI");
-        if (((CheckBox)findViewById(R.id.checkBox6)).isChecked()) daysOpen.add("SAT");
-        if (((CheckBox)findViewById(R.id.checkBox7)).isChecked()) daysOpen.add("SUN");
-        if (((CheckBox)findViewById(R.id.checkBox8)).isChecked()) daysOpen.add("Public Holidays");
+        if (((CheckBox)findViewById(R.id.checkBox11)).isChecked()) daysOpen.add("MON");
+        if (((CheckBox)findViewById(R.id.checkBox12)).isChecked()) daysOpen.add("TUE");
+        if (((CheckBox)findViewById(R.id.checkBox9)).isChecked()) daysOpen.add("WED");
+        if (((CheckBox)findViewById(R.id.checkBox16)).isChecked()) daysOpen.add("THU");
+        if (((CheckBox)findViewById(R.id.checkBox13)).isChecked()) daysOpen.add("FRI");
+        if (((CheckBox)findViewById(R.id.checkBox15)).isChecked()) daysOpen.add("SAT");
+        if (((CheckBox)findViewById(R.id.checkBox14)).isChecked()) daysOpen.add("SUN");
+        if (((CheckBox)findViewById(R.id.checkBox10)).isChecked()) daysOpen.add("Public Holidays");
 
-        return new Groomer(username, daysOpen, businessHrs, durationMin);
+        return new Groomer(username, daysOpen, businessHrs, durationMin, isGoogleConnected);
     }
 
-    private void onSubmit(){
-        Groomer groomer = collectgroomerInpt();
+    private void onSubmit(Groomer groomer){
 
-        if (!validategroomer(groomer)){
-            return; //stops process
+        //check Google sign in
+        if (!isGoogleConnected){
+            Toast.makeText(this, "Please connect your Google account", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        //create FirebaseGroomer with all fields
+        FirebaseGroomer firebaseGroomer = new FirebaseGroomer(
+                groomer.getName(),
+                groomer.getOpenDays(),
+                groomer.getBusinessHrs(),
+                groomer.getDurationMin());
+
+        //Add Google Sign-in status to Firebase data
+        firebaseGroomer.setGoogleConnected(true);
+        firebaseGroomer.setIdentity("groomer");
 
         //save to Firebase - only if its validated
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-        FirebaseGroomer firebaseGroomer = new FirebaseGroomer(groomer.getName(), groomer.getOpenDays(), groomer.getBusinessHrs(), groomer.getDurationMin());
-        usersRef.push().setValue(firebaseGroomer); //adds saved details into the firebase
+        DatabaseReference newGroomerRef = usersRef.push();
+        newGroomerRef.setValue(firebaseGroomer);
+        String groomerKey = newGroomerRef.getKey();
 
         //proceed to intent and go to home page
         Intent intent = new Intent(this, GroomerHome.class);
@@ -111,24 +183,30 @@ public class GroomerRegistration extends AppCompatActivity {
         intent.putExtra("businessHours", groomer.getBusinessHrs());
         intent.putExtra("durationInMinutes",groomer.getDurationMin());
         intent.putStringArrayListExtra("openDays", new ArrayList<>(groomer.getOpenDays()));
+        intent.putExtra("groomerKey", groomerKey);
 
         startActivity(intent);
         finish();
     }
 
 
-    private boolean validategroomer(Groomer groomer){
-        int status = Doctor.isValidHrMin(durationStr);
-
+    private boolean validateGroomer(Groomer groomer){
+        areFieldsValid = false;
+        int status = Groomer.isValidHrMin(durationStr);
 
         //field validations
         //check if any slots are empty/ no checkboxes are checked
-        if(collectgroomerInpt().getOpenDays().isEmpty()){
+        if(groomer.getOpenDays().isEmpty()){
             Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
             return false;
         }
+        if (!Groomer.isValidTimeRange(groomer.getBusinessHrs())){
+            Toast.makeText(this, "Please enter a valid time range (e.g. 09:00-17:00)", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         if (status == Groomer.VALID_TIME) {
-            return true;
+            areFieldsValid = true;
+            return areFieldsValid;
         } else {
             String errorMessage;
 
@@ -163,5 +241,13 @@ public class GroomerRegistration extends AppCompatActivity {
             Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
+    }
+
+    private void signInWithGoogle() {
+        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
+            // Now launch the sign-in intent AFTER sign out
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            googleSignInLauncher.launch(signInIntent);
+        });
     }
 }

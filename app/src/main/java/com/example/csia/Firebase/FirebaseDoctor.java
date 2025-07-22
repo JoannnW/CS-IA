@@ -8,6 +8,7 @@ public class FirebaseDoctor {
     public List<String> openDays;
     public String businessHrs;
     public int durationMin;
+    public boolean googleConnected;
 
     public FirebaseDoctor(){} //for Firebase deserialization
 
@@ -37,5 +38,13 @@ public class FirebaseDoctor {
 
     public String getIdentity() {
         return identity;
+    }
+
+    public void setIdentity(String identity) {
+        this.identity = identity;
+    }
+
+    public void setGoogleConnected(boolean googleConnected) {
+        this.googleConnected = googleConnected;
     }
 }

@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
                 for (DataSnapshot userSnap : snapshot.getChildren()){ //advanced for loop: runs through all users to check identity
                     String existingIdentity = userSnap.child("identity").getValue(String.class);
-                    if ("owner".equalsIgnoreCase(existingIdentity)){ //user's already registered
+                    if (identity.equalsIgnoreCase(existingIdentity)) {
                         userExists = true;
                         firebaseUserKey = userSnap.getKey();
                         break;
@@ -140,8 +140,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initiateGoogleSignIn(Identity user){
+        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, 1001);
+    });
     }
 
     @Override
