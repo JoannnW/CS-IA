@@ -15,15 +15,44 @@
       },
       "oauth_client": [
         {
-          "client_id": "32474676605-kampoqmclugdgsjr117u0qm4bqfj3mfg.apps.googleusercontent.com",
+          "client_id": "32474676605-jc70dbi2t17o6pjia7u1144sfo3e0lvp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMKnZ7mx5j3EEva7KyZRNxbTLQ1GuVEB8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "32474676605-bsq6gkaavvu97jgfq9duotbi4tvkkud9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32474676605:android:4bfbe37df3ec0ba57e6014",
+        "android_client_info": {
+          "package_name": "com.example.csia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32474676605-a8b2strhkjuqus9d9l3ssmhccc1g7ig3.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.company.csia",
+            "package_name": "com.example.csia",
             "certificate_hash": "b650e74b84e656ee4b340675cc171c0c086266b9"
           }
         },
         {
-          "client_id": "32474676605-bsq6gkaavvu97jgfq9duotbi4tvkkud9.apps.googleusercontent.com",
+          "client_id": "32474676605-jc70dbi2t17o6pjia7u1144sfo3e0lvp.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

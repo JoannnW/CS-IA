@@ -106,7 +106,9 @@ public class MainActivity extends AppCompatActivity {
         }
         currentIdentity = identity;
 
-        usersRef.orderByChild("name").equalTo(name).addListenerForSingleValueEvent(new ValueEventListener() {
+        usersRef.orderByChild("name")
+                .equalTo(name)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) { //runs when data is successfully fetched
                 boolean userExists = false;
@@ -246,13 +248,13 @@ public class MainActivity extends AppCompatActivity {
             //fetch the rest of their profile from Firebase before launching
             FirebaseDatabase.getInstance()
                     .getReference("users")
-                    .child(firebaseUserKey)
+                    .child(firebaseUserKey) //key usage here
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             FirebaseOwner fo = snapshot.getValue(FirebaseOwner.class);
                             if (fo == null){
-                                Toast.makeText(MainActivity.this, "Failed to laod owner data", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "Failed to load owner data", Toast.LENGTH_SHORT).show();
                                 return;
                             }
 

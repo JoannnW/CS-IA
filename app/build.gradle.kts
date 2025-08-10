@@ -8,7 +8,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.company.csia"
+        applicationId = "com.example.csia"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -41,6 +41,12 @@ android {
             excludes.add("META-INF/NOTICE")
         }
     }
+
+    sourceSets {
+        getByName("main") {
+            java.srcDirs("src/main/java")
+        }
+    }
 }
 
 dependencies {
@@ -52,7 +58,7 @@ dependencies {
     implementation("androidx.activity:activity:1.8.0")
 
     // Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation(libs.firebase.database)
 
