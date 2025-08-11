@@ -1,18 +1,18 @@
 package com.example.csia.Firebase;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class FirebaseDoctor {
     public String name;
     public String identity;
-    public List<String> openDays;
+    public ArrayList<String> openDays;
     public String businessHrs;
     public int durationMin;
     public boolean googleConnected;
 
     public FirebaseDoctor(){} //for Firebase deserialization
 
-    public FirebaseDoctor(String name, List<String> openDays, String businessHrs, int durationMin){
+    public FirebaseDoctor(String name, ArrayList<String> openDays, String businessHrs, int durationMin){
         this.name = name;
         this.identity = "doctor";
         this.openDays = openDays;
@@ -24,7 +24,7 @@ public class FirebaseDoctor {
         return name;
     }
 
-    public List<String> getOpenDays() {
+    public ArrayList<String> getOpenDays() {
         return openDays;
     }
 

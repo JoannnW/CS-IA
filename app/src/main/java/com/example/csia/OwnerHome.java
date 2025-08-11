@@ -30,7 +30,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class OwnerHome extends AppCompatActivity {
@@ -41,7 +40,7 @@ public class OwnerHome extends AppCompatActivity {
     private String ownerKey; //used to track Firebase key
     private String status;
 
-    private List<BusyTime> busyTimes;
+    private ArrayList<BusyTime> busyTimes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,7 +187,7 @@ public class OwnerHome extends AppCompatActivity {
                     FirebaseDoctor doctor = doctorSnap.getValue(FirebaseDoctor.class);
                     if (doctor != null) {
                         //need to implement this with the actual Google calendar api
-                        List<String> slots = AppointmentSlotCalc.findAvailableSlot(
+                        ArrayList<String> slots = AppointmentSlotCalc.findAvailableSlot(
                                 busyTimes,
                                 doctor,
                                 doctor.openDays,
@@ -216,7 +215,7 @@ public class OwnerHome extends AppCompatActivity {
                 for (DataSnapshot groomerSnap : snapshot.getChildren()) {
                     FirebaseGroomer groomer = groomerSnap.getValue(FirebaseGroomer.class);
                     if (groomer != null) {
-                        List<String> slots = AppointmentSlotCalc.findAvailableSlot(
+                        ArrayList<String> slots = AppointmentSlotCalc.findAvailableSlot(
                                 busyTimes, groomer, groomer.openDays, groomer.durationMin
                         );
                         showSlots(groomer.name, slots, "groomer");
@@ -231,7 +230,7 @@ public class OwnerHome extends AppCompatActivity {
         });
     }
 
-    private void showSlots(String providerName, List<String> slots, String type){
+    private void showSlots(String providerName, ArrayList<String> slots, String type){
         int[] slotTextIds;
         int[] buttonIds;
 
@@ -272,9 +271,9 @@ public class OwnerHome extends AppCompatActivity {
 
         // Save to Firebase
         DatabaseReference requestsRef = FirebaseDatabase.getInstance()
-                .getReference("appointment_requests");
-        String requestKey = requestsRef.push().getKey();
-        requestsRef.child(requestKey).setValue(request);
+                .getReference("appointment_requests");//create new parent node in firebase
+        String requestKey = requestsRef.push().getKey();//save req into a string (reduced queries)
+        requestsRef.child(requestKey).setValue(request); //create owner's appointment request and add details
 
         // Disable all buttons for this provider
         int[] buttonIds = type.equals("groomer")
@@ -314,7 +313,7 @@ public class OwnerHome extends AppCompatActivity {
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<String> options = new ArrayList<>();
+                ArrayList<String> options = new ArrayList<>();
                 for (DataSnapshot ds : snapshot.getChildren()){
                     FirebaseAppointmentReq appt = ds.getValue(FirebaseAppointmentReq.class);
                     if(appt != null && appt.status.equals("pending")){

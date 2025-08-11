@@ -8,10 +8,10 @@ import androidx.annotation.NonNull;
 import com.example.csia.GroomerHome;
 import com.example.csia.GroomerRegistration;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class Groomer extends Identity {
-    private List<String> openDays;
+    private ArrayList<String> openDays;
     private String businessHrs;
     private int durationMin = 0;
     private boolean googleConnected;
@@ -28,7 +28,7 @@ public class Groomer extends Identity {
     public static final int MISSING_M = 8;
 
 
-    public Groomer(String name, List<String> openDays, String businessHrs, int durationMin, boolean googleConnected){
+    public Groomer(String name, ArrayList<String> openDays, String businessHrs, int durationMin, boolean googleConnected){
         super(name, "groomer");
         this.openDays = openDays;
         this.businessHrs = businessHrs;
@@ -36,7 +36,7 @@ public class Groomer extends Identity {
         this.googleConnected = googleConnected;
     }
 
-    public List<String> getOpenDays() {
+    public ArrayList<String> getOpenDays() {
         return openDays;
     }
 

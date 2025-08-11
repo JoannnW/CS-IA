@@ -44,7 +44,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -188,16 +187,16 @@ public class MainActivity extends AppCompatActivity {
                 DateTime now = new DateTime(System.currentTimeMillis());
                 com.google.api.services.calendar.model.Events events = service.events()
                         .list("primary")
-                        .setTimeMin(now)
+                        .setTimeMin(now) // NOW onwards (upcoming events, avoids past events)
                         .setOrderBy("startTime")
-                        .setSingleEvents(true)
+                        .setSingleEvents(true) // De-recurse repeating events
                         .execute();
 
                 //4. process events - two parts:
                 //       a. busytimes for scheduling logic (keep this)
                 //       b. event strings for display
-                List<BusyTime> busyTimes = new ArrayList<>();
-                List<String> eventStrings = new ArrayList<>();
+                ArrayList<BusyTime> busyTimes = new ArrayList<>();
+                ArrayList<String> eventStrings = new ArrayList<>();
 
                 for (com.google.api.services.calendar.model.Event event : events.getItems()){
                     DateTime start = event.getStart().getDateTime();
@@ -242,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void proceedToHome(List<BusyTime> busyTimes, List<String> eventStrings){
+    private void proceedToHome(ArrayList<BusyTime> busyTimes, ArrayList<String> eventStrings){
         Identity user = getIdentityObject(currentIdentity, editTextName.getText().toString().trim());
         if (user instanceof Owner){
             //fetch the rest of their profile from Firebase before launching

@@ -28,7 +28,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class GroomerRegistration extends AppCompatActivity {
     private String username;
@@ -138,7 +137,7 @@ public class GroomerRegistration extends AppCompatActivity {
             Toast.makeText(this, "Invalid duration format", Toast.LENGTH_SHORT).show();
         }
 
-        List<String> daysOpen = new ArrayList<>();
+        ArrayList<String> daysOpen = new ArrayList<>();
         //collect checkboxes
         if (((CheckBox)findViewById(R.id.checkBox11)).isChecked()) daysOpen.add("MON");
         if (((CheckBox)findViewById(R.id.checkBox12)).isChecked()) daysOpen.add("TUE");

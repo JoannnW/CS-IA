@@ -13,8 +13,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class Owner extends Identity {
@@ -23,7 +23,7 @@ public class Owner extends Identity {
     private double weight;
     private double dailyIntake;
     private String latestShoppingDate;
-    private List<String> openDays;
+    private ArrayList<String> openDays;
     private boolean googleConnected;
 
     public Owner(String name,
@@ -32,7 +32,7 @@ public class Owner extends Identity {
                  double weight,
                  double dailyIntake,
                  String latestShoppingDate,
-                 List<String> openDays,
+                 ArrayList<String> openDays,
                  boolean googleConnected){
         super(name, "owner");
         this.storeName = storeName;
@@ -56,7 +56,7 @@ public class Owner extends Identity {
         return weight;
     }
 
-    public List<String> getOpenDays() {
+    public ArrayList<String> getOpenDays() {
         return openDays;
     }
 

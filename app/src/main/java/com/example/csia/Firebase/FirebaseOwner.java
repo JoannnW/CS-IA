@@ -1,6 +1,7 @@
 package com.example.csia.Firebase;
 
-import java.util.List;
+
+import java.util.ArrayList;
 
 public class FirebaseOwner {
     public String name;
@@ -10,7 +11,7 @@ public class FirebaseOwner {
     public double weight;
     public double dailyIntake;
     public String latestShoppingDate;
-    public List<String> openDays;
+    public ArrayList<String> openDays;
     public boolean googleConnected;
 
     public FirebaseOwner(){} //for Firebase deserialization
@@ -21,7 +22,7 @@ public class FirebaseOwner {
                          double weight,
                          double dailyIntake,
                          String latestShoppingDate,
-                         List<String> openDays){
+                         ArrayList<String> openDays){
         this.name = name;
         this.identity = "owner";
         this.storeName = storeName;
@@ -60,7 +61,7 @@ public class FirebaseOwner {
         return weight;
     }
 
-    public List<String> getOpenDays() {
+    public ArrayList<String> getOpenDays() {
         return openDays;
     }
 

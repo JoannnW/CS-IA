@@ -8,10 +8,11 @@ import androidx.annotation.NonNull;
 import com.example.csia.DoctorHome;
 import com.example.csia.DoctorRegistration;
 
-import java.util.List;
+import java.util.ArrayList;
+
 
 public class Doctor extends Identity {
-    private List<String> openDays;
+    private ArrayList<String> openDays;
     private String businessHrs;
     private int durationMin = 0;
     private boolean isGoogleConnected;
@@ -28,7 +29,7 @@ public class Doctor extends Identity {
     public static final int MINUTES_INVALID = 7;
     public static final int MISSING_M = 8;
 
-    public Doctor(String name, List<String> openDays, String businessHrs, int durationMin, boolean isGoogleConnected){
+    public Doctor(String name, ArrayList<String> openDays, String businessHrs, int durationMin, boolean isGoogleConnected){
         super(name, "doctor");
         this.openDays = openDays;
         this.businessHrs = businessHrs;
@@ -36,7 +37,7 @@ public class Doctor extends Identity {
         this.isGoogleConnected = isGoogleConnected;
     }
 
-    public List<String> getOpenDays() {
+    public ArrayList<String> getOpenDays() {
         return openDays;
     }
 

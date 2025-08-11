@@ -11,15 +11,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class AppointmentSlotCalc {
-    public static List<String> findAvailableSlot(List<BusyTime> ownerBusyTimes,
+    public static ArrayList<String> findAvailableSlot(ArrayList<BusyTime> ownerBusyTimes,
                                                  Object serviceProvider,
-                                                 List<String> openDays,
+                                                 ArrayList<String> openDays,
                                                  int durationMin){
-        List<String> availableSlots = new ArrayList<>();
+        ArrayList<String> availableSlots = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
 
         //get business hours
@@ -94,11 +93,16 @@ public class AppointmentSlotCalc {
             e.printStackTrace();
         }
 
+        ArrayList<String> topSlots = new ArrayList<>();
+        int count = Math.min(3, availableSlots.size());
+        for (int i = 0; i < count; i++) {
+            topSlots.add(availableSlots.get(i));
+        }
         //Return top 3 slots
-        return availableSlots.subList(0,Math.min(3,availableSlots.size()));
+        return topSlots;
     }
 
-    private static boolean isSlotAvailable(Date start, Date end, List<BusyTime> busyTimes){
+    private static boolean isSlotAvailable(Date start, Date end, ArrayList<BusyTime> busyTimes){
         for (BusyTime busy : busyTimes){
            if (start.before(busy.getEndTime()) && end.after(busy.getStartTime())){
                return false;

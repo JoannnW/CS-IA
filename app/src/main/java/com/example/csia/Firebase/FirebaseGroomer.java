@@ -1,18 +1,19 @@
 package com.example.csia.Firebase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FirebaseGroomer {
     public String name;
     public String identity;
-    public List<String> openDays;
+    public ArrayList<String> openDays;
     public String businessHrs;
     public int durationMin = 0;
     public boolean isGoogleConnected;
 
     public FirebaseGroomer(){} //for Firebase deserialization
 
-    public FirebaseGroomer(String name, List<String> openDays, String businessHrs, int durationMin){
+    public FirebaseGroomer(String name, ArrayList<String> openDays, String businessHrs, int durationMin){
         this.name = name;
         this.identity = "groomer";
         this.openDays = openDays;

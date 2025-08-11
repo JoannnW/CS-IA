@@ -32,7 +32,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
 
@@ -41,7 +40,7 @@ public class DoctorHome extends AppCompatActivity {
     private AppointmentRequest currentRequest;
 
     private FirebaseDoctor doctor;
-    private List<BusyTime> ownerBusy;
+    private ArrayList<BusyTime> ownerBusy;
     private String ownerId;
 
     private int[] textIds = {R.id.textView37, R.id.textView42, R.id.textView43};
@@ -64,11 +63,11 @@ public class DoctorHome extends AppCompatActivity {
 
         //build providor & busy list
         doctor = new FirebaseDoctor(username, openDays, businessHrs, durationMin);
-        ownerBusy = (List<BusyTime>) getIntent().getSerializableExtra("busyTimes");
+        ownerBusy = (ArrayList<BusyTime>) getIntent().getSerializableExtra("busyTimes");
         if (ownerBusy == null) ownerBusy = new ArrayList<>();
 
         //compute initial slots
-        List<String> slots = AppointmentSlotCalc.findAvailableSlot(
+        ArrayList<String> slots = AppointmentSlotCalc.findAvailableSlot(
                 ownerBusy, doctor, doctor.getOpenDays(), doctor.getDurationMin()
         );
 
@@ -78,7 +77,7 @@ public class DoctorHome extends AppCompatActivity {
         //connect refresh button
         ImageButton refresh = findViewById(R.id.imageButton9);
         refresh.setOnClickListener(v -> {
-            List<String> newSlots = AppointmentSlotCalc.findAvailableSlot(
+            ArrayList<String> newSlots = AppointmentSlotCalc.findAvailableSlot(
                     ownerBusy, doctor, doctor.getOpenDays(), doctor.getDurationMin()
             );
             displaySlots(newSlots);
@@ -90,7 +89,7 @@ public class DoctorHome extends AppCompatActivity {
         loadIncomingRequest();
     }
 
-    private void displaySlots(List<String> slots){
+    private void displaySlots(ArrayList<String> slots){
         for (int i = 0; i < 3; i++) {
             TextView slotText = findViewById(textIds[i]);
             Button deferBtn = findViewById(btnIds[i]);

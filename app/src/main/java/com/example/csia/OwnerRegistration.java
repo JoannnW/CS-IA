@@ -34,7 +34,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class OwnerRegistration extends AppCompatActivity {
 
@@ -148,7 +147,7 @@ public class OwnerRegistration extends AppCompatActivity {
 
         String latestShoppingDate = latestShoppingDateInpt.getText().toString().trim();
 
-        List<String> daysOpen = new ArrayList<>();
+        ArrayList<String> daysOpen = new ArrayList<>();
         //collect checkboxes
         if (((CheckBox)findViewById(R.id.checkBox)).isChecked()) daysOpen.add("MON");
         if (((CheckBox)findViewById(R.id.checkBox2)).isChecked()) daysOpen.add("TUE");
