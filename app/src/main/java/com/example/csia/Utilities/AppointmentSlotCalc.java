@@ -35,6 +35,7 @@ public class AppointmentSlotCalc {
         }
         }
 
+        //split the business hours string into start and end times
         String[] hours = businessHours.split("-");
         if (hours.length < 2) return availableSlots;
 
@@ -42,6 +43,7 @@ public class AppointmentSlotCalc {
         SimpleDateFormat slotFormat = new SimpleDateFormat("EEE, MMM d, yyyy HH:mm", Locale.getDefault());
 
         try {
+            //parse the start and end times into Date objects
             Date openTime = timeFormat.parse(hours[0].trim());
             Date closeTime = timeFormat.parse(hours[1].trim());
 
@@ -94,7 +96,7 @@ public class AppointmentSlotCalc {
         }
 
         ArrayList<String> topSlots = new ArrayList<>();
-        int count = Math.min(3, availableSlots.size());
+        int count = Math.min(3, availableSlots.size());//in case there are less than 3 available slots
         for (int i = 0; i < count; i++) {
             topSlots.add(availableSlots.get(i));
         }
@@ -105,9 +107,10 @@ public class AppointmentSlotCalc {
     private static boolean isSlotAvailable(Date start, Date end, ArrayList<BusyTime> busyTimes){
         for (BusyTime busy : busyTimes){
            if (start.before(busy.getEndTime()) && end.after(busy.getStartTime())){
-               return false;
+               return false; //there is a conflict
            }
         }
-        return true;
+        return true; //no conflict, is available
     }
 }
+

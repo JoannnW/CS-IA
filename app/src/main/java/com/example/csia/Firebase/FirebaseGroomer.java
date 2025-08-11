@@ -1,7 +1,6 @@
 package com.example.csia.Firebase;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FirebaseGroomer {
     public String name;
@@ -29,7 +28,7 @@ public class FirebaseGroomer {
         return businessHrs;
     }
 
-    public List<String> getOpenDays() {
+    public ArrayList<String> getOpenDays() {
         return openDays;
     }
 
