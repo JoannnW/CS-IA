@@ -7,7 +7,8 @@
     android:layout_height="match_parent"
     android:layout_marginBottom="8dp"
     android:animateLayoutChanges="false"
-    android:background="#BC9C6E">
+    android:background="#E07112"
+    android:backgroundTint="#E07112">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,42 +20,41 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
-            android:id="@+id/imageButton2"
-            android:layout_width="422dp"
-            android:layout_height="101dp"
-            android:backgroundTint="#9E7656"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.545"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.038"
-            app:srcCompat="@android:drawable/list_selector_background" />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="346dp"
-            android:layout_height="53dp"
-            android:text="MY DOG BERNARD 🐶"
-            android:textColor="#D7BAAD"
-            android:textSize="34sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.476"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.07" />
-
         <androidx.constraintlayout.widget.Barrier
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="top" />
 
         <ImageButton
+            android:id="@+id/imageButton2"
+            android:layout_width="403dp"
+            android:layout_height="68dp"
+            android:backgroundTint="#9E7656"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.333"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.045" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="270dp"
+            android:layout_height="54dp"
+            android:text="MY DOG BERNARD 🐶"
+            android:textColor="#D7BAAD"
+            android:textSize="26sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.633"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.062" />
+
+        <ImageButton
             android:id="@+id/imageButton3"
-            android:layout_width="356dp"
-            android:layout_height="582dp"
+            android:layout_width="345dp"
+            android:layout_height="638dp"
             android:backgroundTint="#9D7354"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -71,29 +71,83 @@
             android:fontFamily="serif"
             android:text="Homepage"
             android:textColor="#FFFFFF"
-            android:textSize="60sp"
+            android:textSize="40sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.206" />
+            app:layout_constraintVertical_bias="0.276" />
 
         <ScrollView
-            android:layout_width="345dp"
-            android:layout_height="482dp"
+            android:layout_width="335dp"
+            android:layout_height="515dp"
             android:background="#68432A"
             android:scrollbarStyle="insideInset"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.772">
+            app:layout_constraintVertical_bias="0.806">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
+
+
+                <Switch
+                    android:id="@+id/switch1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:background="#E07112 "
+                    android:backgroundTint="#E07112 "
+                    android:button="@color/design_default_color_error"
+                    android:buttonTint="#FF0000"
+                    android:paddingLeft="6dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:switchTextAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:text="Available"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:trackTint="#000000"
+                    android:typeface="normal" />
+
+                <TextView
+                    android:id="@+id/unavailableMsg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="14dp"
+                    android:layout_marginRight="12dp"
+                    android:background="#F1EAAE"
+                    android:backgroundTint="#F1EAAE"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:text="You are currently unavailable. Turn on availability to be contacted by owners for job opportunities."
+                    android:textColor="#7C3D12"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/noOwnerMsg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="14dp"
+                    android:layout_marginRight="12dp"
+                    android:background="#F1EAAE"
+                    android:backgroundTint="#F1EAAE"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:text="No Owner has chosen you yet. When an owner links with you, your available slots will appear here."
+                    android:textColor="#7C3D12"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/textView26"
@@ -104,23 +158,14 @@
                     android:gravity="center_horizontal"
                     android:text="Proposed Grooming Dates"
                     android:textColor="#503A2B"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:visibility="gone" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="54dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/textView27"
-                        android:layout_width="216dp"
-                        android:layout_height="37dp"
-                        android:background="#C3A272"
-                        android:fontFamily="monospace"
-                        android:gravity="center_horizontal|center_vertical"
-                        android:text="Option 1: DD/MM/YYYY 00:00-00:00"
-                        android:textColor="#523522"
-                        android:textSize="14sp" />
+                    android:orientation="horizontal"
+                    android:visibility="visible">
 
                     <Button
                         android:id="@+id/button11"
@@ -135,24 +180,28 @@
                         android:paddingLeft="20dp"
                         android:paddingRight="20dp"
                         android:text="Defer?"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/textView27"
+                        android:layout_width="216dp"
+                        android:layout_height="37dp"
+                        android:background="#C3A272"
+                        android:fontFamily="monospace"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:text="Option 1: DD/MM/YYYY 00:00-00:00"
+                        android:textColor="#523522"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/textView29"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="#BC9C6E"
-                        android:fontFamily="monospace"
-                        android:gravity="center_horizontal"
-                        android:text="Option 2: DD/MM/YYYY 00:00-00:00"
-                        android:textColor="#65412A" />
+                    android:orientation="horizontal"
+                    android:visibility="visible">
 
                     <Button
                         android:id="@+id/button4"
@@ -166,25 +215,28 @@
                         android:paddingLeft="20dp"
                         android:paddingRight="20dp"
                         android:text="Defer?"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/textView29"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#BC9C6E"
+                        android:fontFamily="monospace"
+                        android:gravity="center_horizontal"
+                        android:text="Option 2: DD/MM/YYYY 00:00-00:00"
+                        android:textColor="#65412A"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/textView30"
-                        android:layout_width="220dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="#BC9C6E"
-                        android:fontFamily="monospace"
-                        android:gravity="center_horizontal"
-                        android:text="Option 3: DD/MM/YYYY 00:00-00:00"
-                        android:textColor="#65412A" />
+                    android:orientation="horizontal"
+                    android:visibility="visible">
 
                     <Button
                         android:id="@+id/button12"
@@ -199,7 +251,20 @@
                         android:paddingLeft="18dp"
                         android:paddingRight="18dp"
                         android:text="Defer?"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/textView30"
+                        android:layout_width="220dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#BC9C6E"
+                        android:fontFamily="monospace"
+                        android:gravity="center_horizontal"
+                        android:text="Option 3: DD/MM/YYYY 00:00-00:00"
+                        android:textColor="#65412A"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
@@ -209,6 +274,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:backgroundTint="#8A1F1C"
+                    android:visibility="gone"
                     app:srcCompat="@android:drawable/ic_popup_sync" />
 
                 <TextView
@@ -220,12 +286,14 @@
                     android:gravity="center_horizontal"
                     android:text="Requested Date:\nDD/MM/YYYY 00:00-00:00"
                     android:textColor="#503A2B"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:visibility="gone" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="visible">
 
                     <Button
                         android:id="@+id/button6"
@@ -235,7 +303,8 @@
                         android:layout_marginRight="2dp"
                         android:layout_weight="1"
                         android:backgroundTint="#4EA245"
-                        android:text="Accept" />
+                        android:text="Accept"
+                        android:visibility="gone" />
 
                     <Button
                         android:id="@+id/button7"
@@ -245,7 +314,8 @@
                         android:layout_marginTop="4dp"
                         android:layout_weight="1"
                         android:backgroundTint="#A24545"
-                        android:text="Reject" />
+                        android:text="Reject"
+                        android:visibility="gone" />
                 </LinearLayout>
 
 
@@ -263,10 +333,9 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.182" />
+            app:layout_constraintVertical_bias="0.178" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

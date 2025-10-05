@@ -8,7 +8,8 @@ public class FirebaseDoctor {
     public ArrayList<String> openDays;
     public String businessHrs;
     public int durationMin;
-    public boolean googleConnected;
+    public boolean googleConnected, isLinked;
+    public String linkedOwnerId;
 
     public FirebaseDoctor(){} //for Firebase deserialization
 
@@ -18,6 +19,8 @@ public class FirebaseDoctor {
         this.openDays = openDays;
         this.businessHrs = businessHrs;
         this.durationMin = durationMin;
+        this.googleConnected = false;
+        this.isLinked = false;
     }
 
     public String getName() {
@@ -44,7 +47,17 @@ public class FirebaseDoctor {
         this.identity = identity;
     }
 
-    public void setGoogleConnected(boolean googleConnected) {
-        this.googleConnected = googleConnected;
+    public void setGoogleConnected(boolean googleConnected) { this.googleConnected = googleConnected; }
+
+    public void setLinked(boolean linked) { isLinked = linked; }
+
+    public boolean getLinked (){ return isLinked; }
+
+    public String getLinkedOwnerId() {
+        return linkedOwnerId;
+    }
+
+    public void setLinkedOwnerId(String linkedOwnerId) {
+        this.linkedOwnerId = linkedOwnerId;
     }
 }

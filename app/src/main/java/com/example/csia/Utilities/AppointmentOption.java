@@ -4,6 +4,8 @@ public class AppointmentOption {
     private String dateTimeRange;
     private boolean isDeferred;
 
+    public AppointmentOption(){}
+
     public AppointmentOption(String dateTimeRange){
         this.dateTimeRange = dateTimeRange;
         this.isDeferred = false;

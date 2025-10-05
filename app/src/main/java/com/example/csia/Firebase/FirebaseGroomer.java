@@ -8,7 +8,8 @@ public class FirebaseGroomer {
     public ArrayList<String> openDays;
     public String businessHrs;
     public int durationMin = 0;
-    public boolean isGoogleConnected;
+    public boolean googleConnected, isLinked;
+    public String linkedOwnerid;
 
     public FirebaseGroomer(){} //for Firebase deserialization
 
@@ -18,6 +19,8 @@ public class FirebaseGroomer {
         this.openDays = openDays;
         this.businessHrs = businessHrs;
         this.durationMin = durationMin;
+        this.googleConnected = false;
+        this.isLinked = false;
     }
 
     public int getDurationMin() {
@@ -41,10 +44,22 @@ public class FirebaseGroomer {
     }
 
     public void setGoogleConnected(boolean googleConnected) {
-        isGoogleConnected = googleConnected;
+        this.googleConnected = googleConnected;
     }
 
     public void setIdentity(String identity) {
         this.identity = identity;
+    }
+
+    public void setLinked(boolean linked) { isLinked = linked; }
+
+    public boolean getLinked (){ return isLinked; }
+
+    public String getLinkedOwnerid() {
+        return linkedOwnerid;
+    }
+
+    public void setLinkedOwnerid(String linkedOwnerid) {
+        this.linkedOwnerid = linkedOwnerid;
     }
 }

@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.csia.Firebase.FirebaseGroomer;
 import com.example.csia.Identities.Groomer;
+import com.example.csia.Utilities.BusyTime;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -52,6 +53,7 @@ public class GroomerRegistration extends AppCompatActivity {
         setContentView(R.layout.groomer_register);
 
         //Initialize Google sign-in
+        btnGoogleUpdate = findViewById(R.id.textView20);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestScopes(new Scope("https://www.googleapis.com/auth/calendar"))
@@ -64,17 +66,23 @@ public class GroomerRegistration extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                        if (task.isSuccessful()) {
-                            GoogleSignInAccount account = task.getResult();
+                        try {
+                            GoogleSignInAccount account = task.getResult(ApiException.class);
                             isGoogleConnected = true;
-                            btnGoogleUpdate = findViewById(R.id.textView20);
-                            btnGoogleUpdate.setText("Google connected!");
-                            Toast.makeText(this, "Successful Google Sign-in", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(this, "Google Sign-In failed.", Toast.LENGTH_SHORT).show();
+
+                            if (btnGoogleUpdate != null) {
+                                btnGoogleUpdate.setText("Google connected!");
+                            }
+
+                            Toast.makeText(this, "Google Sign-in successful!", Toast.LENGTH_SHORT).show();
+
+                        } catch (ApiException e) {
+                            Toast.makeText(this, "Google Sign-In failed: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
+                            isGoogleConnected = false;
                         }
                     } else {
                         Toast.makeText(this, "Google Sign-In canceled or failed.", Toast.LENGTH_SHORT).show();
+                        isGoogleConnected = false;
                     }
                 }
         );
@@ -170,22 +178,28 @@ public class GroomerRegistration extends AppCompatActivity {
         firebaseGroomer.setGoogleConnected(true);
         firebaseGroomer.setIdentity("groomer");
 
-        //save to Firebase - only if its validated
+        // Save to Firebase
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
         DatabaseReference newGroomerRef = usersRef.push();
-        newGroomerRef.setValue(firebaseGroomer);
-        String groomerKey = newGroomerRef.getKey();
+        newGroomerRef.setValue(firebaseGroomer)
+                .addOnSuccessListener(aVoid -> {
+                    String groomerKey = newGroomerRef.getKey();
 
-        //proceed to intent and go to home page
-        Intent intent = new Intent(this, GroomerHome.class);
-        intent.putExtra("username", groomer.getName());
-        intent.putExtra("businessHours", groomer.getBusinessHrs());
-        intent.putExtra("durationInMinutes",groomer.getDurationMin());
-        intent.putStringArrayListExtra("openDays", new ArrayList<>(groomer.getOpenDays()));
-        intent.putExtra("groomerKey", groomerKey);
-
-        startActivity(intent);
-        finish();
+                    // Proceed to home page with key for future updates
+                    Intent intent = new Intent(this, GroomerHome.class);
+                    intent.putExtra("username", groomer.getName());
+                    intent.putExtra("businessHours", groomer.getBusinessHrs());
+                    intent.putExtra("durationInMinutes", groomer.getDurationMin());
+                    intent.putStringArrayListExtra("openDays", new ArrayList<>(groomer.getOpenDays()));
+                    intent.putExtra("groomerKey", groomerKey);
+                    intent.putExtra("busyTimes", new ArrayList<BusyTime>());
+                    intent.putStringArrayListExtra("eventStrings", new ArrayList<String>());
+                    startActivity(intent);
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
 
@@ -242,9 +256,11 @@ public class GroomerRegistration extends AppCompatActivity {
         }
     }
 
+
     private void signInWithGoogle() {
-        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
-            // Now launch the sign-in intent AFTER sign out
+        // sign out to ensure the account chooser always appears
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            // after sign-out is complete, start the sign-in intent
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             googleSignInLauncher.launch(signInIntent);
         });

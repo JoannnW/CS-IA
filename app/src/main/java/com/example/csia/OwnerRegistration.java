@@ -6,6 +6,7 @@ import static com.example.csia.Identities.Owner.isValidWeight;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -55,6 +56,7 @@ public class OwnerRegistration extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_register);
+        btnGoogleUpdate = findViewById(R.id.textView49);
 
         //Initialize Google sign-in
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -76,26 +78,31 @@ public class OwnerRegistration extends AppCompatActivity {
         exitBtn = findViewById(R.id.imageButton5);
 
         googleSignInButton.setOnClickListener(v -> {
-            Owner owner = collectOwnerInpt();
-            if (validateOwner(owner)){signInWithGoogle(); }
-            else { Toast.makeText(this,"Please fill all fields correctly first",Toast.LENGTH_SHORT).show();}});
+            signInWithGoogle();
+        });
 
         googleSignInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                        if (task.isSuccessful()) {
-                            GoogleSignInAccount account = task.getResult();
+                        try {
+                            GoogleSignInAccount account = task.getResult(ApiException.class);
                             isGoogleConnected = true;
-                            btnGoogleUpdate = findViewById(R.id.textView49);
-                            btnGoogleUpdate.setText("Google connected!");
-                            Toast.makeText(this, "Successful Google Sign-in", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(this, "Google Sign-In failed.", Toast.LENGTH_SHORT).show();
+
+                            if (btnGoogleUpdate != null) {
+                                btnGoogleUpdate.setText("Google connected!");
+                            }
+
+                            Toast.makeText(this, "Google Sign-in successful!", Toast.LENGTH_SHORT).show();
+
+                        } catch (ApiException e) {
+                            Toast.makeText(this, "Google Sign-In failed: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
+                            isGoogleConnected = false;
                         }
                     } else {
                         Toast.makeText(this, "Google Sign-In canceled or failed.", Toast.LENGTH_SHORT).show();
+                        isGoogleConnected = false;
                     }
                 }
         );
@@ -103,12 +110,20 @@ public class OwnerRegistration extends AppCompatActivity {
         submitBtn.setOnClickListener(view -> {
             Owner owner = collectOwnerInpt();
             if (validateOwner(owner) && isGoogleConnected){ onSubmit(owner); }
-            else if (!isGoogleConnected) {Toast.makeText(this,"Please complete all steps", Toast.LENGTH_SHORT).show();} });
+            else if (!isGoogleConnected) {
+                Toast.makeText(this,"Please complete Google account first", Toast.LENGTH_SHORT).show();}
+            else {
+                Toast.makeText(this, "Please fix validation errors", Toast.LENGTH_SHORT).show();
+            } });
 
         submitBtn2.setOnClickListener(view -> {
             Owner owner = collectOwnerInpt();
             if (validateOwner(owner) && isGoogleConnected){ onSubmit(owner); }
-            else if (!isGoogleConnected) {Toast.makeText(this,"Please complete all steps", Toast.LENGTH_SHORT).show();} });
+            else if (!isGoogleConnected) {
+                Toast.makeText(this,"Please complete Google account first", Toast.LENGTH_SHORT).show();}
+            else {
+                Toast.makeText(this, "Please fix validation errors", Toast.LENGTH_SHORT).show();
+            } });
 
         exitBtn.setOnClickListener(view -> onExit());
 
@@ -118,7 +133,7 @@ public class OwnerRegistration extends AppCompatActivity {
         Toast.makeText(this, "Your information was not saved. Returning to login...", Toast.LENGTH_LONG).show();
         new android.os.Handler().postDelayed(()-> {
             Intent intent = new Intent(OwnerRegistration.this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK); //reset navigation
             startActivity(intent);
             finish();
         }, 2000); //toast display and screen pauses for 2 seconds before screen switches back to login page
@@ -162,6 +177,7 @@ public class OwnerRegistration extends AppCompatActivity {
     }
 
     private void onSubmit(Owner owner){
+
         //check Google sign in
         if (!isGoogleConnected){
             Toast.makeText(this, "Please connect your Google account", Toast.LENGTH_SHORT).show();
@@ -173,33 +189,37 @@ public class OwnerRegistration extends AppCompatActivity {
                 owner.getName(),
                 owner.getStoreName(),           //Store name
                 owner.getOpeningHours(),           //Opening Hrs
-                owner.getWeight(),                 //Total food wiehgt
+                owner.getWeight(),                 //Total food weight
                 owner.getDailyIntake(),            //Daily intake
                 owner.getLatestShoppingDate(),     //latest shopping date
                 owner.getOpenDays());              //Open days
 
         //Add Google Sign-in status to Firebase data
         firebaseOwner.setGoogleConnected(true);
+        firebaseOwner.setIdentity("owner");
 
         //save to Firebase - only if its validated and get reference
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
         DatabaseReference newOwnerRef = usersRef.push();
-        newOwnerRef.setValue(firebaseOwner);
-        String ownerKey = newOwnerRef.getKey();
 
-        //proceed to home page with key for future updates
-        Intent intent = new Intent(this, OwnerHome.class);
-        intent.putExtra("username", owner.getName());
-        intent.putExtra("storeName", owner.getStoreName());
-        intent.putExtra("openingHours", owner.getOpeningHours());
-        intent.putExtra("weight", owner.getWeight());
-        intent.putExtra("dailyIntake", owner.getDailyIntake());
-        intent.putExtra("latestShoppingDate", owner.getLatestShoppingDate());
-        intent.putStringArrayListExtra("openDays", new ArrayList<>(owner.getOpenDays()));
-        intent.putExtra("ownerKey", ownerKey); //needed for rescheduling
+        newOwnerRef.setValue(firebaseOwner).addOnSuccessListener(aVoid -> {
+            String ownerKey = newOwnerRef.getKey();
+            //proceed to home page with key for future updates
+            Intent intent = new Intent(this, OwnerHome.class);
+            intent.putExtra("username", owner.getName());
+            intent.putExtra("storeName", owner.getStoreName());
+            intent.putExtra("openingHours", owner.getOpeningHours());
+            intent.putExtra("weight", owner.getWeight());
+            intent.putExtra("dailyIntake", owner.getDailyIntake());
+            intent.putExtra("latestShoppingDate", owner.getLatestShoppingDate());
+            intent.putStringArrayListExtra("openDays", new ArrayList<>(owner.getOpenDays()));
+            intent.putExtra("ownerKey", ownerKey); //needed for rescheduling
 
-        startActivity(intent);
-        finish();
+            startActivity(intent);
+            finish();
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
     }
 
     private boolean validateOwner(Owner owner){
@@ -235,9 +255,10 @@ public class OwnerRegistration extends AppCompatActivity {
         return areFieldsValid;
     }
 
-    private void signInWithGoogle(){
-        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
-            // Now launch the sign-in intent AFTER sign out
+    private void signInWithGoogle() {
+        // sign out to ensure the account chooser always appears
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            // after sign-out is complete, start the sign-in intent
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             googleSignInLauncher.launch(signInIntent);
         });

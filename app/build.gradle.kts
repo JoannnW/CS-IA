@@ -62,6 +62,11 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation(libs.firebase.database)
 
+    //Firebase Notifs
+    implementation("com.google.firebase:firebase-auth:21.0.1")
+    implementation("com.google.firebase:firebase-database:20.0.2")
+    implementation("com.google.firebase:firebase-messaging:23.0.0")
+
     // Fix Jackson version conflict
     implementation("com.fasterxml.jackson.core:jackson-core:2.12.5")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.12.5")

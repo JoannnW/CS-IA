@@ -3,6 +3,7 @@ package com.example.csia;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -97,70 +98,88 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void handleLogin(String identity){
-        String name = editTextName.getText().toString().trim();//trim() removes whitespace from the beginning and end of the string, in case the user accidentally does that
-        if (name.isEmpty()){
-            Toast.makeText(this,"Please enter your name", Toast.LENGTH_SHORT).show();//first S.C. - whether user inputs name or not
+    private void handleLogin(String identity) {
+        String name = editTextName.getText().toString().trim();
+        if (name.isEmpty()) {
+            Toast.makeText(this, "Please enter your name", Toast.LENGTH_SHORT).show();
             return;
         }
         currentIdentity = identity;
 
-        usersRef.orderByChild("name")
-                .equalTo(name)
+        // Query by name first, then filter by identity
+        usersRef.orderByChild("name").equalTo(name)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) { //runs when data is successfully fetched
-                boolean userExists = false;
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean userExists = false;
+                        boolean isGoogleConnected = false;
+                        String userKey = null;
+                        String existingIdentity = null;
 
-                for (DataSnapshot userSnap : snapshot.getChildren()){ //advanced for loop: runs through all users to check identity
-                    String existingIdentity = userSnap.child("identity").getValue(String.class);
-                    if (identity.equalsIgnoreCase(existingIdentity)) {
-                        userExists = true;
-                        firebaseUserKey = userSnap.getKey();
-                        break;
+                        for (DataSnapshot userSnap : snapshot.getChildren()) {
+                            existingIdentity = userSnap.child("identity").getValue(String.class);
+                            String existingName = userSnap.child("name").getValue(String.class);
+
+                            // Check if both name AND identity match
+                            if (identity.equalsIgnoreCase(existingIdentity) && name.equalsIgnoreCase(existingName)) {
+                                userExists = true;
+                                userKey = userSnap.getKey();
+                                firebaseUserKey = userKey;
+
+                                // Check Google connection status
+                                Boolean googleStatus = userSnap.child("googleConnected").getValue(Boolean.class);
+                                isGoogleConnected = (googleStatus != null) && googleStatus;
+                                break;
+                            }
+                        }
+
+                        if (userExists) {
+                            if (isGoogleConnected) {
+                                // User exists and is Google connected - proceed directly to home
+                                firebaseUserKey = userKey; //save unique key
+                                proceedToHome(new ArrayList<>(), new ArrayList<>());
+                            } else {
+                                // this case shouldn't happen.... User exists but not Google connected
+                                Toast.makeText(MainActivity.this, "Error: User exists but not Google connected", Toast.LENGTH_SHORT).show();
+                                proceedToHome(new ArrayList<>(), new ArrayList<>());
+                            }
+                        } else {
+                            // New user - go to registration
+                            Intent registrationIntent = new Intent(MainActivity.this,
+                                    identity.equals("doctor") ? DoctorRegistration.class : //Java short-hand notation (“W3Schools.com”)
+                                            identity.equals("groomer") ? GroomerRegistration.class : OwnerRegistration.class); //Java short-hand notation (“W3Schools.com”)
+                            registrationIntent.putExtra("username", name);
+                            startActivity(registrationIntent);
+                        }
                     }
-                }
 
-                Identity user = getIdentityObject(identity, name);
-                if (user != null){
-                    if (userExists){
-                        initiateGoogleSignIn(user);
-                    } else{
-                        //Unregistered user --> go to register page
-                        user.goToRegistration(MainActivity.this);
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(MainActivity.this, "Failed to load data.", Toast.LENGTH_SHORT).show();
                     }
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {//runs if the request fails (e.g. no internet)
-                Toast.makeText(MainActivity.this, "Failed to load data.", Toast.LENGTH_SHORT).show();//Firebase error
-            }
-        });
+                });
     }
 
-    private void initiateGoogleSignIn(Identity user){
-        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
+    private void initiateGoogleSignIn(){
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, 1001);
-    });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1001) { //if the returning result from the activity is the same as the unique ID (1001)
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data); //extracts sign-in result returned by Google through Intent
+        if (requestCode == 1001) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             if (task.isSuccessful()) {
                 GoogleSignInAccount account = task.getResult();
+                // User is signed in and we have the account, now fetch calendar events
                 fetchCalendarEvents(account);
             } else {
                 Toast.makeText(this, "Sign-in failed", Toast.LENGTH_SHORT).show();
-                Identity user = getIdentityObject(currentIdentity, editTextName.getText().toString().trim());
-                if (user != null){
-                    user.goToHome(MainActivity.this);
-                }
+                // If sign-in fails, send them back to the login screen
+                Intent loginIntent = new Intent(this, MainActivity.class);
+                startActivity(loginIntent);
+                finish();
             }
         }
     }
@@ -193,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                         .execute();
 
                 //4. process events - two parts:
-                //       a. busytimes for scheduling logic (keep this)
+                //       a. busytimes for scheduling logic
                 //       b. event strings for display
                 ArrayList<BusyTime> busyTimes = new ArrayList<>();
                 ArrayList<String> eventStrings = new ArrayList<>();
@@ -259,13 +278,13 @@ public class MainActivity extends AppCompatActivity {
 
                             //build Intent with all the extras
                             Intent home = new Intent(MainActivity.this, OwnerHome.class);
-                            home.putExtra("username", fo.getName());
-                            home.putExtra("storeName", fo.getStoreName());
-                            home.putExtra("openingHours", fo.getOpeningHours());
+                            home.putExtra("username", fo.getName() != null ? fo.getName() : ""); //Java short-hand notation (“W3Schools.com”)
+                            home.putExtra("storeName", fo.getStoreName() != null ? fo.getStoreName() : ""); //Java short-hand notation (“W3Schools.com”)
+                            home.putExtra("openingHours", fo.getOpeningHours() != null ? fo.getOpeningHours() : ""); //Java short-hand notation (“W3Schools.com”)
                             home.putExtra("weight", fo.getWeight());
                             home.putExtra("dailyIntake", fo.getDailyIntake());
-                            home.putExtra("latestShoppingDate", fo.getLatestShoppingDate());
-                            home.putStringArrayListExtra("openDays", new ArrayList<>(fo.getOpenDays()));
+                            home.putExtra("latestShoppingDate", fo.getLatestShoppingDate() != null ? fo.getLatestShoppingDate() : ""); //Java short-hand notation (“W3Schools.com”)
+                            home.putStringArrayListExtra("openDays", fo.getOpenDays() != null ? new ArrayList<>(fo.getOpenDays()) : new ArrayList<>()); //Java short-hand notation (“W3Schools.com”)
                             home.putExtra("ownerKey", firebaseUserKey);
                             home.putExtra("busyTimes", new ArrayList<>(busyTimes));
                             home.putStringArrayListExtra("eventStrings", new ArrayList<>(eventStrings));
@@ -283,6 +302,17 @@ public class MainActivity extends AppCompatActivity {
             home.putExtra("username", user.getName());
             home.putExtra("busyTimes", new ArrayList<>(busyTimes));
             home.putStringArrayListExtra("eventStrings", new ArrayList<>(eventStrings));
+            home.putExtra("groomerKey", firebaseUserKey);
+            home.putExtra("ownerId", "");
+            startActivity(home);
+            finish();
+        } else if (user instanceof Doctor) {
+            Intent home = new Intent(this, DoctorHome.class);
+            home.putExtra("username", user.getName());
+            home.putExtra("busyTimes", new ArrayList<>(busyTimes));
+            home.putStringArrayListExtra("eventStrings", new ArrayList<>(eventStrings));
+            home.putExtra("doctorKey", firebaseUserKey);
+            home.putExtra("ownerId", "");
             startActivity(home);
             finish();
         }
@@ -301,16 +331,4 @@ public class MainActivity extends AppCompatActivity {
         else{ return null; }
     }
 
-    //FOR FIREBASE: User class: used for saving new users to or retrieving user data from Firebase/ passing user data between activities
-    public static class User {
-        public String name;
-        public String identity;
-
-        public User(){}
-
-        public User(String name, String identity){
-            this.name = name;
-            this.identity = identity;
-        }
-    }
 }

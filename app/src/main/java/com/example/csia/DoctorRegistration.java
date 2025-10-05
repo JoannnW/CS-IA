@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.csia.Firebase.FirebaseDoctor;
 import com.example.csia.Identities.Doctor;
+import com.example.csia.Identities.Groomer;
+import com.example.csia.Identities.Owner;
+import com.example.csia.Utilities.BusyTime;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -51,6 +54,8 @@ public class DoctorRegistration extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.doctor_register);
+        btnGoogleUpdate = findViewById(R.id.textView14);
+
 
         //Initialize Google sign-in
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -65,21 +70,26 @@ public class DoctorRegistration extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                        if (task.isSuccessful()) {
-                            GoogleSignInAccount account = task.getResult();
+                        try {
+                            GoogleSignInAccount account = task.getResult(ApiException.class);
                             isGoogleConnected = true;
-                            btnGoogleUpdate = findViewById(R.id.textView20);
-                            btnGoogleUpdate.setText("Google connected!");
-                            Toast.makeText(this, "Successful Google Sign-in", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(this, "Google Sign-In failed.", Toast.LENGTH_SHORT).show();
+
+                            if (btnGoogleUpdate != null) {
+                                btnGoogleUpdate.setText("Google connected!");
+                            }
+
+                            Toast.makeText(this, "Google Sign-in successful!", Toast.LENGTH_SHORT).show();
+
+                        } catch (ApiException e) {
+                            Toast.makeText(this, "Google Sign-In failed: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
+                            isGoogleConnected = false;
                         }
                     } else {
                         Toast.makeText(this, "Google Sign-In canceled or failed.", Toast.LENGTH_SHORT).show();
+                        isGoogleConnected = false;
                     }
                 }
         );
-
         username = getIntent().getStringExtra("username");  // get username from intent
 
         businessHrsInpt = findViewById(R.id.editTextText6);
@@ -142,7 +152,7 @@ public class DoctorRegistration extends AppCompatActivity {
         }
 
         ArrayList<String> daysOpen = new ArrayList<>();
-        //collect checkboxes
+        //collect checkboxes/ days working
         if (((CheckBox)findViewById(R.id.checkBox)).isChecked()) daysOpen.add("MON");
         if (((CheckBox)findViewById(R.id.checkBox2)).isChecked()) daysOpen.add("TUE");
         if (((CheckBox)findViewById(R.id.checkBox3)).isChecked()) daysOpen.add("WED");
@@ -151,45 +161,49 @@ public class DoctorRegistration extends AppCompatActivity {
         if (((CheckBox)findViewById(R.id.checkBox6)).isChecked()) daysOpen.add("SAT");
         if (((CheckBox)findViewById(R.id.checkBox7)).isChecked()) daysOpen.add("SUN");
         if (((CheckBox)findViewById(R.id.checkBox8)).isChecked()) daysOpen.add("Public Holidays");
-
         return new Doctor(username, daysOpen, businessHrs, durationMin, isGoogleConnected);
     }
 
-    private void onSubmit(Doctor doctor){
-        //check Google sign in
-        if (!isGoogleConnected){
+    private void onSubmit(Doctor doctor) {
+        // Check Google sign in
+        if (!isGoogleConnected) {
             Toast.makeText(this, "Please connect your Google account", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        //create FirebaseDoctor with all fields
+        // Create FirebaseDoctor with all fields
         FirebaseDoctor firebaseDoctor = new FirebaseDoctor(
                 doctor.getName(),
                 doctor.getOpenDays(),
                 doctor.getBusinessHrs(),
-                doctor.getDurationMin());
-
-        //Add Google Sign-in status to Firebase data
+                doctor.getDurationMin()
+        );
+        // Add Google Sign-in status to Firebase data
         firebaseDoctor.setGoogleConnected(true);
         firebaseDoctor.setIdentity("doctor");
 
-
-        //save to Firebase - only if its validated
+        // Save to Firebase
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
         DatabaseReference newDoctorRef = usersRef.push();
-        newDoctorRef.setValue(firebaseDoctor);
-        String doctorKey = newDoctorRef.getKey();
+        newDoctorRef.setValue(firebaseDoctor)
+                .addOnSuccessListener(aVoid -> {
+                    String doctorKey = newDoctorRef.getKey();
 
-        //proceed to intent and go to home page
-        Intent intent = new Intent(this, DoctorHome.class);
-        intent.putExtra("username", doctor.getName());
-        intent.putExtra("businessHours", doctor.getBusinessHrs());
-        intent.putExtra("durationInMinutes",doctor.getDurationMin());
-        intent.putStringArrayListExtra("openDays", new ArrayList<>(doctor.getOpenDays()));
-        intent.putExtra("doctorKey", doctorKey); //needed for rescheduling
-
-        startActivity(intent);
-        finish();
+                    // Proceed to home page with key for future updates
+                    Intent intent = new Intent(this, DoctorHome.class);
+                    intent.putExtra("username", doctor.getName());
+                    intent.putExtra("businessHours", doctor.getBusinessHrs());
+                    intent.putExtra("durationInMinutes", doctor.getDurationMin());
+                    intent.putStringArrayListExtra("openDays", new ArrayList<>(doctor.getOpenDays()));
+                    intent.putExtra("doctorKey", doctorKey);
+                    intent.putExtra("ownerId", ""); // Add empty ownerId
+                    intent.putExtra("busyTimes", new ArrayList<BusyTime>());
+                    startActivity(intent);
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
 
@@ -247,8 +261,9 @@ public class DoctorRegistration extends AppCompatActivity {
     }
 
     private void signInWithGoogle() {
-        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
-            // Now launch the sign-in intent AFTER sign out
+        // sign out to ensure the account chooser always appears
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            // after sign-out is complete, start the sign-in intent
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             googleSignInLauncher.launch(signInIntent);
         });

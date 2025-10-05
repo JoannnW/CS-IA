@@ -113,7 +113,7 @@ public class Groomer extends Identity {
         String minutePart = parts[1].replace("m", ""); // Remove 'm' if present
         int minutes;
         try {
-            minutes = minutePart.isEmpty() ? 0 : Integer.parseInt(minutePart);
+            minutes = minutePart.isEmpty() ? 0 : Integer.parseInt(minutePart); //Java short-hand notation (“W3Schools.com”)
         } catch (NumberFormatException e) {
             return MINUTES_NOT_NUMBER;
         }
